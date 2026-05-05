@@ -525,64 +525,127 @@ def gauge(value: float, budget: float, title: str, color: str) -> go.Figure:
     return fig
 
 
-def bar_bu_vs_budget(emissions: dict, budgets: dict,
-                     optimised: dict | None = None) -> go.Figure:
-    bus = sorted(set(emissions.keys()) | set(budgets.keys()))
-    actual  = [emissions.get(b, 0) for b in bus]
-    budget  = [budgets.get(b, np.nan) for b in bus]
-    colors  = [BU_COLOR.get(b, COLOR["muted"]) for b in bus]
+def bar_bu_vs_budget(
+    emissions: dict,
+    budgets: dict,
+    optimised: dict | None = None,
+) -> go.Figure:
+    """Stacked horizontal bar chart per BU.
 
-    # Slightly desaturated version of each BU color for the optimised bar
-    def _lighten(hex_color: str, factor: float = 0.45) -> str:
+    Each bar has two segments:
+      • Solid segment  = CO2 remaining after applying alternatives (optimised)
+      • Hatched segment = CO2 saved by switching modes (saving potential)
+    Both segments use the same BU color; the saving segment is lighter so the
+    split is immediately readable. A dotted line marks the annual budget.
+    """
+
+    bus    = sorted(set(emissions.keys()) | set(budgets.keys()))
+    actual = [emissions.get(b, 0) for b in bus]
+    budget = [budgets.get(b, np.nan) for b in bus]
+
+    if optimised:
+        opt_vals = [optimised.get(b, emissions.get(b, 0)) for b in bus]
+    else:
+        opt_vals = list(actual)
+
+    savings = [max(a - o, 0) for a, o in zip(actual, opt_vals)]
+
+    def _lighten(hex_color: str, factor: float = 0.50) -> str:
         h = hex_color.lstrip("#")
         r, g, bl = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-        r = int(r + (255 - r) * factor)
-        g = int(g + (255 - g) * factor)
+        r  = int(r  + (255 - r)  * factor)
+        g  = int(g  + (255 - g)  * factor)
         bl = int(bl + (255 - bl) * factor)
         return f"#{r:02X}{g:02X}{bl:02X}"
 
+    solid_colors  = [BU_COLOR.get(b, COLOR["muted"]) for b in bus]
+    saving_colors = [_lighten(BU_COLOR.get(b, COLOR["muted"])) for b in bus]
+
     fig = go.Figure()
 
-    if optimised:
-        opt_vals    = [optimised.get(b, emissions.get(b, 0)) for b in bus]
-        opt_colors  = [_lighten(BU_COLOR.get(b, COLOR["muted"])) for b in bus]
-        # Optimised bar (behind)
-        fig.add_bar(
-            y=bus, x=opt_vals, orientation="h", name="With alternatives",
-            marker=dict(color=opt_colors, pattern=dict(shape="/", fgcolor="rgba(255,255,255,0.6)", size=5)),
-            hovertemplate="<b>%{y}</b><br>With alternatives: %{x:.1f} t<extra></extra>",
+    # ── Segment 1: optimised (remaining) CO2 ─────────────────────────────────
+    hover_base = []
+    for b, opt, act in zip(bus, opt_vals, actual):
+        saving = act - opt
+        pct    = (saving / act * 100) if act > 0 else 0
+        hover_base.append(
+            f"<b>{b}</b><br>"
+            f"CO2 with alternatives: <b>{opt:.1f} t</b><br>"
+            f"Potential saving: −{saving:.1f} t ({pct:.0f}%)<br>"
+            f"Actual (as planned): {act:.1f} t"
         )
 
-    # Actual bar
     fig.add_bar(
-        y=bus, x=actual, orientation="h", name="Actual",
-        marker=dict(color=colors),
-        hovertemplate="<b>%{y}</b><br>Actual: %{x:.1f} t<extra></extra>",
+        name="CO2 with alternatives",
+        y=bus,
+        x=opt_vals,
+        orientation="h",
+        marker=dict(color=solid_colors, line=dict(width=0)),
+        hovertemplate="%{customdata}<extra></extra>",
+        customdata=hover_base,
     )
 
-    # Budget markers
+    # ── Segment 2: saving potential (stacked on top) ──────────────────────────
+    hover_save = []
+    for b, s, act in zip(bus, savings, actual):
+        pct = (s / act * 100) if act > 0 else 0
+        hover_save.append(
+            f"<b>{b}</b><br>"
+            f"Saving potential: <b>−{s:.1f} t ({pct:.0f}%)</b><br>"
+            f"Switch applicable flights to lower-CO2 mode"
+        )
+
+    fig.add_bar(
+        name="Saving potential",
+        y=bus,
+        x=savings,
+        orientation="h",
+        marker=dict(
+            color=saving_colors,
+            pattern=dict(shape="/", fgcolor="rgba(255,255,255,0.6)", size=5),
+            line=dict(width=0),
+        ),
+        hovertemplate="%{customdata}<extra></extra>",
+        customdata=hover_save,
+    )
+
+    # ── Budget markers ────────────────────────────────────────────────────────
     for i, (bu, bud) in enumerate(zip(bus, budget)):
         if not pd.isna(bud):
             fig.add_shape(
-                type="line", x0=bud, x1=bud, y0=i - 0.4, y1=i + 0.4,
+                type="line",
+                x0=bud, x1=bud,
+                y0=i - 0.45, y1=i + 0.45,
                 line=dict(color=COLOR["ink"], width=2, dash="dot"),
             )
     fig.add_trace(
         go.Scatter(
-            x=[b for b in budget if not pd.isna(b)],
-            y=[bu for bu, b in zip(bus, budget) if not pd.isna(b)],
-            mode="markers", marker=dict(symbol="line-ns", size=18, color=COLOR["ink"]),
-            name="Budget", hovertemplate="<b>%{y}</b><br>Budget: %{x:.1f} t<extra></extra>",
+            x=[None], y=[None],
+            mode="lines",
+            line=dict(color=COLOR["ink"], width=2, dash="dot"),
+            name="Budget",
         )
     )
+
     n_bus = len(bus)
     fig.update_layout(**plotly_layout(
-        height=max(230, 80 + 55 * n_bus), showlegend=True,
-        barmode="overlay",
-        margin=dict(l=10, r=10, t=30, b=10),
-        legend=dict(orientation="h", y=1.15, x=0),
-        xaxis=dict(title="CO2 (t)", showgrid=True, gridcolor=COLOR["border"], zeroline=False),
+        height=max(240, 70 + 65 * n_bus),
+        showlegend=True,
+        barmode="stack",
+        margin=dict(l=10, r=10, t=40, b=10),
+        legend=dict(
+            orientation="h", y=1.18, x=0,
+            font=dict(size=11),
+            bgcolor="rgba(255,255,255,0)",
+        ),
+        xaxis=dict(
+            title="CO2 (t)",
+            showgrid=True,
+            gridcolor=COLOR["border"],
+            zeroline=False,
+        ),
         yaxis=dict(showgrid=False, autorange="reversed"),
+        bargap=0.3,
     ))
     return fig
 
@@ -1002,14 +1065,16 @@ else:
                 st.markdown("<div class='section-title'>Budget compliance by Business Unit</div>", unsafe_allow_html=True)
                 st.markdown(
                     "<div class='section-hint'>Status gauges and ranking, side by side. "
-                    "Line on each gauge marks the BU's annual budget.</div>",
+                    "Solid bar = actual CO2; hatched bar = CO2 after applying best available alternatives. "
+                    "Dotted line marks each BU's annual budget.</div>",
                     unsafe_allow_html=True,
                 )
 
                 bu_emissions = estimated.groupby("business_unit")["estimated_co2"].sum().to_dict()
                 bus_present  = sorted(set(bu_emissions.keys()) | set(budgets.keys()))
 
-                # Compute per-BU optimised emissions (apply alts_original regardless of scenario)
+                # Always compute optimised emissions from the original (as-planned) data
+                # so the saving potential is visible regardless of the active scenario.
                 _opt_estimated = apply_alternatives(estimated_original, alts_original)
                 bu_optimised = _opt_estimated.groupby("business_unit")["estimated_co2"].sum().to_dict()
 
@@ -1032,6 +1097,7 @@ else:
                                 )
 
                 with right:
+                    # Always pass bu_optimised so the saving potential is permanently visible
                     st.plotly_chart(
                         bar_bu_vs_budget(bu_emissions, budgets, bu_optimised),
                         use_container_width=True,

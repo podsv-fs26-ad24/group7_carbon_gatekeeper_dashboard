@@ -1,147 +1,100 @@
 # Data Report
-All information on the data used in the project is compiled in the data report in order to ensure the traceability and reproducibility of the results and to enable a systematic expansion of the database.
 
-Typically, in the exploratory analysis of the acquired raw data, quality and other issues are identified, which require pre-processing, merging of individual datasets and feature engineering into processed datasets. Therefore, this template provides a separate section for the processed data, which then serves as a starting point for the modelling activities. This needs to be adapted to the specific project requirements.
+All information on the data used in the Carbon Gatekeeper Dashboard project is compiled in this data report. This ensures the traceability and reproducibility of the results, specifically regarding how historical travel records and planned trip inputs are merged to calculate CO₂ budgets and modal shift potentials.
 
-## Raw data
+---
+
+## Raw Data
+
 ### Overview Raw Datasets
 
-: Overview of raw datasets used in the project. {#tbl-raw-overview}
+| Name | Source | Storage Location |
+|---|---|---|
+| Historical Reference Data | Company travel management system (~25,000+ records) | `traveldataexport_clean.xlsx` (Uploaded via Streamlit Sidebar) |
+| Planned Trips Input | User-provided operational travel plans | `input_data.xlsx` (Uploaded via Streamlit Sidebar) |
 
-| Name | Quelle | Storage location |
-|----------------|-----------------------------------------|--------------------------------------------------------------------------|
-| Dataset 1      | Name/short description of the data source | Link and/or short description of the location where the data is stored, e.g. accessible to the team |
-| Dataset 2      | …                                       | …                                                                        |
+---
 
-### Details Dataset 1
+### Details Dataset 1: Historical Reference Data
 
-- Description of what information the dataset contains
-- Details of the data source/provider
-- Information on data procurement: description and possibly references to resources (download scripts, tools, online services, ...). Any new team member should be able to acquire the data indepentendently following these instructions.
-- Legal aspects of data use, licences, etc.
-- Data governance aspects: Categorisation of the data based on internal business requirements, e.g. public, business-relevant, personal
-- If applicable: categorisation into dependent (target variable, regressor) and independent (regressor) variables
-- ...
+- **Description:** This dataset serves as the baseline for all calculations. It contains over 25,000 historical business travel records, detailing routes, modes of transport, costs, and CO₂ emissions calculated via RFI methodologies. It also includes the official 2026 CO₂ budgets for each Business Unit (BU).
+- **Data Source:** Company internal travel and sustainability department.
+- **Data Governance:** Internal business use. Contains BU-level aggregations and routing data.
 
-#### Data Catalogue
-The data catalogue basically represents an extended schema of a relational database.
+#### Data Catalogue — `travel_data` Sheet
 
-
-: Data catalogue for Dataset 1. {#tbl-data-catalogue}
-
-| Column index | Column name |  Datatype | Values (Range, validation rules) | Short description |
+| Column Index | Column Name | Datatype | Values (Range, Validation Rules) | Short Description |
 |---|---|---|---|---|
-| 1 |   |   |   |   |
-| 2 |   |   |   |   |
-|   |   |   |   |   |
+| 1 | `date` | Datetime | Valid dates | Date of the trip. |
+| 2 | `business_unit` | String | e.g., "BU1", "BU2", "BU3", "BU4" | Department responsible for the trip. |
+| 3 | `transport_mode` | String | "flight", "train", "bus", "rental_car" | Mode of transportation used. |
+| 4 | `departure_iata` | String | 3-letter IATA code | Origin location. |
+| 5 | `arrival_iata` | String | 3-letter IATA code | Destination location. |
+| 6 | `departure_lat` / `lon` | Float | -90 to 90 / -180 to 180 | Geographical coordinates of origin. |
+| 7 | `arrival_lat` / `lon` | Float | -90 to 90 / -180 to 180 | Geographical coordinates of destination. |
+| 8 | `km` | Float | > 0 | Distance of the trip in kilometers. |
+| 9 | `cost_CHF` | Float | > 0 | Cost of the trip in CHF. |
+| 10 | `CO2e RFI2 (t)` | Float | >= 0 | Emissions using RFI 2 multiplier. |
+| 11 | `CO2e RFI2.7 (t)` | Float | >= 0 | Emissions using RFI 2.7 multiplier. |
+| 12 | `travel_purpose` | String | Free text / categories | Reason for the business trip. |
 
+#### Data Catalogue — `budget_2026` Sheet
 
-#### If applicable: Entity Relationship Diagram
+| Column Index | Column Name | Datatype | Values (Range, Validation Rules) | Short Description |
+|---|---|---|---|---|
+| 1 | `Business Unit` | String | Starts with "BU" | The targeted business unit. |
+| 2 | `Budget 2026 (t)` | Float | >= 0 (parsed from string) | The allocated CO₂ budget in tons. |
 
+#### Data Characteristics and Quality
 
-#### Data Chracteristics and Quality
+- **Missing Values:** The application relies heavily on `departure_iata`, `arrival_iata`, and `transport_mode` to build historical averages. Trips missing geographical coordinates (`lat`/`lon`) will not render on the global maps — they are explicitly dropped during map generation via `.dropna(subset=["dep_lat", ...])`.
+- **Budget Parsing:** Budget values are provided as strings containing commas and spaces. Preprocessing is required to strip these characters and cast them to numeric values (`pd.to_numeric`).
+- **Metric Selection:** The dataset contains dual CO₂ metrics. The application allows users to toggle between RFI2 and RFI2.7 dynamically.
 
-The methods of exploratory data analysis are used to describe relevant characteristics of the data and identify data quality issues. This includes, for example, 
+---
 
-the univariate andalysis of numerical variables:
+### Details Dataset 2: Planned Trips Input
 
-* Number or fraction
-    * of unique values
-    * of missing values
-    * of zero values
-    * of negative values
-* Frequency distribution
-* Extreme values (minimum and maximum)
-* Histogram
-* Measures of central tendency:
-    * arithmetic mean
-    * median
-    * mode
-* Measures of dispersion and visualisation of dispersion:
-    * Range
-    * Quantiles and interquartile range (IQR)
-    * Box plot
-    * Variance and standard deviation 
+- **Description:** A dynamic list of planned, upcoming trips provided by the travel or sustainability manager. If not provided, the dashboard defaults to analyzing the historical data itself.
+- **Required Columns:** Must contain `transport_mode`, `departure_iata`, `arrival_iata`, and `business_unit`. Missing CO₂ or coordinate columns are accepted and imputed dynamically based on historical averages.
 
-and for categorical variables:
-
-* number of classes
-* and the corresponding distribution of values
-* fraction of missing values
-
-The correlation between variables in the form of
-
-* correlation coefficients (e.g. Pearson, Spearman, Kendall)
-* and corresponding visualizations, e.g. scatter plot, heatmap, grouped box plot (for categorical-numerical relationships), ...
-
-
-The results the exploratory data analysis should be summarised here (code and full output in the `eda` subfolder) and the implications for the subsequent data pre-processing, visualization design and implementation steps should be discussed. Is the data quality and quantity sufficient to achieve the visualisation goals? Is it necessary to acquire additional or different data? Are there any limitations that need to be considered in the design and implementation of the visualisation product? Are there any specific data characteristics that can be used to enhance the visualisation design? For example, if there are a lot of missing values in a dataset, this might need to be taken into account in the design of the visualisation product, e.g. by using specific visual encodings to indicate missing values or by providing options for filtering or imputing missing values. 
-
-Tip: `Ydata-profiling` is a Python library that can be used to perform exploratory data analysis and generate a comprehensive report on the characteristics of the data, including the distribution of values, missing values, correlations between variables, and more. This can be a useful tool to generate the full analysis in the code section and then only include the relevant information here in the data report.
-
-This is an example on how to incorporate executable Python code and show a figure output:
-
-```{python}
-#| label: fig-demo
-#| fig-cap: "Distribution of monthly revenue across product categories (sample data)."
-#| echo: true
-#| code-fold: true
-import matplotlib.pyplot as plt
-
-# Sample data
-categories = ['Electronics', 'Clothing', 'Food', 'Books', 'Sports']
-revenue = [42000, 28500, 35200, 12800, 19400]
-
-# Create the bar chart
-fig, ax = plt.subplots(figsize=(6, 3.75))
-
-bars = ax.bar(categories, revenue, color='#4C78A8', edgecolor='white')
-
-ax.set_xlabel('Product Category')
-ax.set_title('Monthly Revenue by Product Category')
-
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['left'].set_visible(False)
-ax.yaxis.set_visible(False)
-ax.tick_params(axis='x', length=0)
-
-# Add value labels on bars
-for bar, val in zip(bars, revenue):
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 500,
-            f'{val:,.0f}', ha='center', va='bottom', fontsize=9)
-
-plt.tight_layout()
-plt.show()
-```
-
-Then the figure can be referenced with @fig-demo.
+---
 
 ## Processed Data
+
 ### Overview Processed Datasets
 
-: Overview of processed datasets used in the project. {#tbl-processed-overview}
+| Name | Source | Storage Location |
+|---|---|---|
+| `route_averages` | Generated from Historical Reference Data | In-memory (Pandas DataFrame) |
+| `estimated_original` | Planned Trips enriched with `route_averages` | In-memory (Exportable via UI) |
+| `alts_original` | Filtered subset of `estimated_original` | In-memory (Exportable via UI) |
 
-| Name | Quelle | Storage location |
-|----------------|-----------------------------------------|--------------------------------------------------------------------------|
-| Processed Dataset 1      | Name/short description of the data source | Link and/or short description of the location where the data is stored, e.g. accessible to the team |
-| Processed Dataset 2      | …                                       | …                                                                        |
+---
 
-### Details Processed Dataset 1
+### Details Processed Dataset 1: Route Averages (`route_averages`)
 
-- Description of what information the dataset contains
-- Details and reasons for the processing steps -> Traceability and ensuring reproducibility
-- How can the data be accessed? Description, scripts, tools, ...
-- ...
+- **Description:** An aggregated lookup table created by grouping historical data by `departure_iata`, `arrival_iata`, and `transport_mode`.
+- **Processing Steps:** Calculates the mean CO₂ (`avg_co2`), mean distance (`avg_km`), and average cost per route/mode. It also extracts the first available geographical coordinates (`dep_lat`, `dep_lon`, etc.) for mapping purposes.
 
-#### Data Catalogue
+---
 
+### Details Processed Dataset 2: Enriched Input (`estimated_original`)
 
-#### If applicable: Entity Relationship Diagram
+- **Description:** The planned trips dataset transformed into a complete analytical set.
+- **Processing Steps:**
+  1. The user's input data is merged (Left Join) with `route_averages` on origin, destination, and mode.
+  2. **Imputation:** If the planned trip lacks a CO₂ value, it is populated using the historical `avg_co2` for that specific route and mode, resulting in the `estimated_co2` column. Missing geographical coordinates are filled using the same method.
 
+---
 
-#### Data Chracteristics and Quality
+### Details Processed Dataset 3: Modal Shift Alternatives (`alts_original`)
 
-
-### Details Processed Dataset 2
-...
+- **Description:** Identifies exactly which planned flights can be substituted with greener alternatives.
+- **Processing Steps:**
+  1. Filters `estimated_original` for flights.
+  2. Joins these flights with `route_averages` where the mode is *not* a flight.
+  3. Filters for instances where `alt_co2` < `estimated_co2`.
+  4. Calculates `saving_t` (absolute reduction) and `saving_pct` (relative reduction).
+  5. If multiple alternatives exist (e.g., train and bus), it sorts and selects the single best alternative (maximum `saving_t`) for that original trip row.
+  6. This processed set feeds the **"Apply alternatives"** scenario toggle in the dashboard.

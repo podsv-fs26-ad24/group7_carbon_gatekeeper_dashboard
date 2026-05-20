@@ -196,13 +196,13 @@ Counts of trips by `person_type`, `transport_mode`, `haul`, `business_unit`, `tr
 - **Business unit:** BU1 = 6,821 · BU3 = 6,719 · BU2 = 6,164 · BU4 = 5,823
 - **Travel purpose:** client_meeting = 6,975 · internal_meeting = 5,828 · workshop = 3,791 · training = 3,612 · trade_fair = 2,722 · site_visit = 2,599
 
-> **[PLATZHALTER: `fig_4_1_categorical_counts.png` — 2×3 grid of bar plots: trip counts per category for the six categorical variables above.]**
+![](pics/univariate_analysis.png){ width=80% }
 
 ### Univariate Analysis — Numeric Variables
 
 Distance and CO₂ are heavily right-tailed; log-scaled boxplots per transport mode make the differences between flights and ground transport visible.
 
-> **[PLATZHALTER: `fig_4_2_numeric_boxplots.png` — boxplots (log y-axis) of `km` and `CO2e RFI2 (t)` per `transport_mode`.]**
+![](pics/numerical_variables.png){ width=80% }
 
 ### Temporal Development
 

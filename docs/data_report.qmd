@@ -1,6 +1,17 @@
 # Data Report
 
-All information on the data used in the Carbon Gatekeeper Dashboard project is compiled in this data report. This ensures the traceability and reproducibility of the results, specifically regarding how historical travel records and planned trip inputs are merged to calculate CO₂ budgets and modal shift potentials.
+This data report documents all data used in the **Carbon Gatekeeper Dashboard** project. It covers the identification and acquisition of relevant data sources and the exploratory data analysis (EDA) performed to understand data quality and structure. Together, these two parts cover the *Data Acquisition and Exploration* phase of the project.
+
+The report ensures **traceability and reproducibility** of the results — in particular, how the historical travel records were prepared, how the CO₂ budgets for 2026 were derived, and how planned trips are merged with the historical reference data to calculate emissions and modal-shift potentials in the dashboard.
+
+> **Data pipeline at a glance**
+>
+> `traveldataexport.xlsx` (raw export)
+>     → manual cleaning in Excel + CO₂-budget assumption for 2026
+>     → `traveldataexport_clean.xlsx` (historical reference loaded into the app)
+>     → `input_data.xlsx` (planned trips, used to test the dashboard)
+
+---
 
 ---
 
@@ -8,93 +19,307 @@ All information on the data used in the Carbon Gatekeeper Dashboard project is c
 
 ### Overview Raw Datasets
 
-| Name | Source | Storage Location |
-|---|---|---|
-| Historical Reference Data | Company travel management system (~25,000+ records) | `traveldataexport_clean.xlsx` (Uploaded via Streamlit Sidebar) |
-| Planned Trips Input | User-provided operational travel plans | `input_data.xlsx` (Uploaded via Streamlit Sidebar) |
-
----
+| Name                      | Source                                              | Storage Location                                |
+| ------------------------- | --------------------------------------------------- | ----------------------------------------------- |
+| Travel Data Export (raw)  | Company travel management system (~25,500 records) | `traveldataexport.xlsx`                         |
+| Planned Trips Input       | User-provided operational travel plans              | `input_data.xlsx` (uploaded via Streamlit sidebar) |
 
 ### Details Dataset 1: Historical Reference Data
 
-- **Description:** This dataset serves as the baseline for all calculations. It contains over 25,000 historical business travel records, detailing routes, modes of transport, costs, and CO₂ emissions calculated via RFI methodologies. It also includes the official 2026 CO₂ budgets for each Business Unit (BU).
-- **Data Source:** Company internal travel and sustainability department.
-- **Data Governance:** Internal business use. Contains BU-level aggregations and routing data.
+- **Description:** Original export from the corporate travel management system. Contains **25,527 business-trip segments** over the period **2017-01-01 to 2026-01-05** for four transport modes (flight, train, bus, rental car). Each row represents one trip segment with full geographic information, CO₂ figures calculated under two Radiative Forcing Index (RFI) assumptions, costs in CHF and an organisational mapping (business unit / subunit).
+- **Data Source:** Internal travel and sustainability department.
+- **Data Governance:** Internal business use. No personally identifiable information is stored — only `person_type` (employee vs. guest).
+- **File Format:** Excel workbook with three sheets: `travel_data` (25,527 × 27), `data_dictionary` (27 × 3) and `co2_budgets` (100 × 3).
 
 #### Data Catalogue — `travel_data` Sheet
 
-| Column Index | Column Name | Datatype | Values (Range, Validation Rules) | Short Description |
-|---|---|---|---|---|
-| 1 | `date` | Datetime | Valid dates | Date of the trip. |
-| 2 | `business_unit` | String | e.g., "BU1", "BU2", "BU3", "BU4" | Department responsible for the trip. |
-| 3 | `transport_mode` | String | "flight", "train", "bus", "rental_car" | Mode of transportation used. |
-| 4 | `departure_iata` | String | 3-letter IATA code | Origin location. |
-| 5 | `arrival_iata` | String | 3-letter IATA code | Destination location. |
-| 6 | `departure_lat` / `lon` | Float | -90 to 90 / -180 to 180 | Geographical coordinates of origin. |
-| 7 | `arrival_lat` / `lon` | Float | -90 to 90 / -180 to 180 | Geographical coordinates of destination. |
-| 8 | `km` | Float | > 0 | Distance of the trip in kilometers. |
-| 9 | `cost_CHF` | Float | > 0 | Cost of the trip in CHF. |
-| 10 | `CO2e RFI2 (t)` | Float | >= 0 | Emissions using RFI 2 multiplier. |
-| 11 | `CO2e RFI2.7 (t)` | Float | >= 0 | Emissions using RFI 2.7 multiplier. |
-| 12 | `travel_purpose` | String | Free text / categories | Reason for the business trip. |
+| #  | Column Name                   | Datatype | Values / Range                                            | Short Description                                                                          |
+| -- | ----------------------------- | -------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 1  | `person_type`                 | text     | `employee`, `guest`                                       | Employee or external guest travelling on behalf of the company.                            |
+| 2  | `date`                        | date     | 2017-01-01 … 2026-01-05                                   | Date of the trip segment.                                                                  |
+| 3  | `transport_mode`              | text     | `flight`, `train`, `bus`, `rental_car`                    | Mode of transport.                                                                         |
+| 4  | `departure_iata`              | text     | 3-letter IATA code                                        | Departure airport / city (e.g. `ZRH` = Zurich).                                            |
+| 5  | `arrival_iata`                | text     | 3-letter IATA code                                        | Arrival airport / city.                                                                    |
+| 6  | `travel_class`                | text     | Flights: `Y`/`B`/`P`; trains: `standard`/`first`          | Booking class.                                                                             |
+| 7  | `flight_number`               | text     | e.g. `LX340`; `NaN` for ground transport                  | Airline code + number.                                                                     |
+| 8  | `CO2e RFI2 (t)`               | number   | ≥ 0                                                       | CO₂-equivalent emissions in tonnes using a Radiative Forcing Index of 2.                   |
+| 9  | `CO2e RFI2.7 (t)`             | number   | ≥ 0                                                       | CO₂-equivalent emissions using RFI 2.7 (non-CO₂ altitude effects); equals RFI2 for ground. |
+| 10 | `km`                          | number   | > 0                                                       | Great-circle distance in kilometres.                                                       |
+| 11 | `haul`                        | text     | `short haul`, `mid haul`, `long haul`, `ground`           | Distance category (short < ~1500 km; ground = train/bus/car).                              |
+| 12 | `departure_city`              | text     | —                                                         | Departure city name.                                                                       |
+| 13 | `departure_country`           | text     | ISO 2-letter                                              | Departure country.                                                                         |
+| 14 | `departure_continent`         | text     | `EU`, `AS`, `NA`, …                                       | Departure continent.                                                                       |
+| 15 | `departure_lat`               | number   | -90 … 90                                                  | Departure latitude (WGS 84).                                                               |
+| 16 | `departure_lon`               | number   | -180 … 180                                                | Departure longitude (WGS 84).                                                              |
+| 17 | `arrival_city`                | text     | —                                                         | Arrival city name.                                                                         |
+| 18 | `arrival_country`             | text     | ISO 2-letter                                              | Arrival country.                                                                           |
+| 19 | `arrival_continent`           | text     | —                                                         | Arrival continent.                                                                         |
+| 20 | `arrival_lat`                 | number   | -90 … 90                                                  | Arrival latitude (WGS 84).                                                                 |
+| 21 | `arrival_lon`                 | number   | -180 … 180                                                | Arrival longitude (WGS 84).                                                                |
+| 22 | `aircraft_type`               | text     | e.g. `Airbus A320`; `NaN` for ground transport            | Aircraft model (flights only).                                                             |
+| 23 | `business_unit`               | text     | `BU1`, `BU2`, `BU3`, `BU4`                                | Organisational business unit.                                                              |
+| 24 | `subunit`                     | text     | `Subunit 1.1`, `Subunit 1.2`, … `Subunit 4.2` (10 levels) | Organisational subunit within the BU.                                                      |
+| 25 | `travel_purpose`              | text     | 6 categories (see below)                                  | Purpose of the trip.                                                                       |
+| 26 | `cost_CHF`                    | number   | > 0                                                       | Trip cost in Swiss francs.                                                                 |
+| 27 | `train_alternative_available` | boolean  | `True` / `False`                                          | `True` if a realistic train connection exists (< 800 km, both ends in Europe).            |
 
-#### Data Catalogue — `budget_2026` Sheet
+Travel purposes: `client_meeting`, `internal_meeting`, `workshop`, `trade_fair`, `site_visit`, `training`.
 
-| Column Index | Column Name | Datatype | Values (Range, Validation Rules) | Short Description |
-|---|---|---|---|---|
-| 1 | `Business Unit` | String | Starts with "BU" | The targeted business unit. |
-| 2 | `Budget 2026 (t)` | Float | >= 0 (parsed from string) | The allocated CO₂ budget in tons. |
+#### Data Catalogue — `co2_budgets` Sheet (raw)
 
-#### Data Characteristics and Quality
+| # | Column Name    | Datatype | Values / Range                | Short Description                              |
+| - | -------------- | -------- | ----------------------------- | ---------------------------------------------- |
+| 1 | `subunit`      | text     | `Subunit 1.1` … `Subunit 4.2` | Organisational subunit (10 distinct values).   |
+| 2 | `year`         | integer  | 2017 … 2026                   | Reporting year.                                |
+| 3 | `co2_budget_t` | number   | ≥ 0 or `NaN`                  | Allocated CO₂ budget in tonnes for that year.  |
 
-- **Missing Values:** The application relies heavily on `departure_iata`, `arrival_iata`, and `transport_mode` to build historical averages. Trips missing geographical coordinates (`lat`/`lon`) will not render on the global maps — they are explicitly dropped during map generation via `.dropna(subset=["dep_lat", ...])`.
-- **Budget Parsing:** Budget values are provided as strings containing commas and spaces. Preprocessing is required to strip these characters and cast them to numeric values (`pd.to_numeric`).
-- **Metric Selection:** The dataset contains dual CO₂ metrics. The application allows users to toggle between RFI2 and RFI2.7 dynamically.
-
----
+Note that the raw `co2_budgets` sheet provides values only for **2020–2025** (`NaN` for 2017–2019 and for **2026**). The 2026 figures are derived during the data preparation step (see Section "Data Preparation & Cleaning" below).
 
 ### Details Dataset 2: Planned Trips Input
 
-- **Description:** A dynamic list of planned, upcoming trips provided by the travel or sustainability manager. If not provided, the dashboard defaults to analyzing the historical data itself.
-- **Required Columns:** Must contain `transport_mode`, `departure_iata`, `arrival_iata`, and `business_unit`. Missing CO₂ or coordinate columns are accepted and imputed dynamically based on historical averages.
+- **Description:** A dynamic list of planned, upcoming trips provided by the travel or sustainability manager and uploaded into the Streamlit dashboard. Used to estimate future emissions against the 2026 budget and to identify modal-shift potential. If no input file is provided, the dashboard falls back to analysing the historical data itself.
+- **File Format:** Excel workbook with two sheets: `planned_trips` (the trip list) and `instructions` (German-language template guide).
+- **Sample sizes used for testing:**
+    - `input_data.xlsx` — **1,936 planned trips** (compact test set; calibrated to push two BUs over budget and contain several flights with a train alternative).
+    - `input_data_3.xlsx` — **6,429 planned trips** (larger stress-test set).
+- **Required columns:** `business_unit`, `transport_mode`, `departure_iata`, `arrival_iata`. Optional: `date`, `person_type`, `travel_purpose`, `cost_CHF`. Coordinates, kilometres and CO₂ are **not** required — they are enriched on the fly by the dashboard from the historical reference.
+
+#### Data Catalogue — `planned_trips` Sheet
+
+| # | Column Name      | Datatype | Required? | Allowed values                                                                                                            |
+| - | ---------------- | -------- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 1 | `date`           | date     | optional  | `YYYY-MM-DD` — helps with time filters                                                                                    |
+| 2 | `business_unit`  | text     | required  | `BU1`, `BU2`, `BU3`, `BU4`                                                                                                |
+| 3 | `person_type`    | text     | optional  | `employee`, `guest`                                                                                                       |
+| 4 | `transport_mode` | text     | required  | `flight`, `train`, `bus`, `rental_car`                                                                                    |
+| 5 | `departure_iata` | text     | required  | IATA code                                                                                                                 |
+| 6 | `arrival_iata`   | text     | required  | IATA code                                                                                                                 |
+| 7 | `travel_purpose` | text     | optional  | `client_meeting`, `internal_meeting`, `site_visit`, `trade_fair`, `training`, `workshop`                                  |
+| 8 | `cost_CHF`       | number   | optional  | Planned travel cost in CHF                                                                                                |
 
 ---
 
-## Processed Data
+## Data Preparation & Cleaning
+
+The raw export `traveldataexport.xlsx` was processed **manually in Microsoft Excel** to produce `traveldataexport_clean.xlsx`. The cleaning step did **not** change any trip records — the cleaned `travel_data` sheet has the same row count (25,527) as the raw export.
+
+### Changes applied
+
+1. **Column reduction (27 → 20 columns).** The following eight columns were dropped from `travel_data` because the dashboard does not use them:
+   `travel_class`, `flight_number`, `departure_city`, `departure_continent`, `arrival_city`, `arrival_continent`, `aircraft_type`, `subunit`.
+2. **New column `budget_2026` added to `travel_data`.** The 2026 CO₂ budget of the trip's BU is denormalised onto every trip row to simplify the per-trip budget comparison in the dashboard.
+3. **New sheet `budget_2026` added.** A human-readable budget overview table (per BU, columns *2024*, *2025*, *2026 (Prognose)*, plus a total row).
+4. **`data_dictionary` updated** to reflect the reduced column set (19 entries instead of 27).
+5. **`co2_budgets` sheet kept as-is** — still 100 rows (10 subunits × 10 years 2017–2026).
+
+### Assumption: CO₂ budget 2026
+
+The raw `co2_budgets` sheet contains values up to **2025 only**; the 2026 row is empty (`NaN`). To make the dashboard usable for the upcoming planning year, we derived the **2026 budget** ourselves and stored it in the new `budget_2026` sheet:
+
+> **Assumption.** *The CO₂ budget continues the historical reduction trajectory of roughly **−10 % per year** observed between 2020 and 2025. We therefore set the 2026 budget per BU equal to **2025 × 0.9**, rounded to one decimal place.*
+
+The resulting 2026 budgets per Business Unit are:
+
+| Business Unit | 2024 (t) | 2025 (t) | **2026 (Prognose, t)** |
+| ------------- | -------- | -------- | ---------------------- |
+| BU1           | 253.7    | 230.6    | **207.5**              |
+| BU2           | 258.5    | 235.0    | **211.5**              |
+| BU3           | 294.5    | 267.7    | **240.9**              |
+| BU4           | 220.8    | 200.6    | **181.2**              |
+| **Total**     | 1,027.5  | 933.9    | **841.1**              |
+
+These values are the reference used by every gauge, banner and KPI in the dashboard.
+
+### Cleaned reference file: `traveldataexport_clean.xlsx`
+
+| Sheet             | Rows × Cols  | Purpose                                                                |
+| ----------------- | ------------ | ---------------------------------------------------------------------- |
+| `travel_data`     | 25,527 × 20  | Cleaned historical trips with `budget_2026` denormalised onto each row |
+| `data_dictionary` | 19 × 3       | Column descriptions for the cleaned travel data                        |
+| `budget_2026`     | 6 × 4        | Per-BU budgets 2024 / 2025 / 2026                                      |
+| `co2_budgets`     | 100 × 3      | Historical subunit-level budgets 2017–2026                             |
+
+The cleaned `travel_data` sheet contains **no missing values, no duplicate rows, no negative kilometres / CO₂ / costs**, so no further programmatic cleaning was required in the EDA notebook.
+
+---
+
+## Exploratory Data Analysis (EDA)
+
+The exploratory data analysis was carried out in the Jupyter notebook **`eda/eda_travel_data.ipynb`** on the cleaned file `traveldataexport_clean.xlsx`. The goal was to understand structure, distributions and emission drivers of the historical travel data before designing the visualisations.
+
+> Placeholders are marked with **`[PLATZHALTER: …]`** — replace each with the rendered image (or embed the code chunk in Quarto) before publishing.
+
+### Setup & Data Import
+
+The notebook imports `travel_data`, `data_dictionary`, `budget_2026` and `co2_budgets` into pandas DataFrames using `pd.read_excel(...)`. Confirmed shapes:
+
+```
+travel_data:     25,527 rows × 20 columns
+data_dictionary: 19 × 3
+budget_2026:     6 × 4
+co2_budgets:     100 × 3
+```
+
+### Data Quality
+
+| Check                                       | Result                       |
+| ------------------------------------------- | ---------------------------- |
+| Missing values (`travel_data`)              | 0                            |
+| Fully duplicated rows                       | 0                            |
+| Negative `km`                               | 0                            |
+| Negative `CO2e RFI2 (t)`                    | 0                            |
+| Negative `cost_CHF`                         | 0                            |
+| Date range                                  | 2017-01-01 → 2026-01-05      |
+
+Summary statistics of the numeric columns:
+
+| Statistic | km          | CO2e RFI2 (t) | CO2e RFI2.7 (t) | cost_CHF   |
+| --------- | ----------- | ------------- | --------------- | ---------- |
+| count     | 25,527      | 25,527        | 25,527          | 25,527     |
+| mean      | 1,904.8     | 0.30          | 0.42            | 740.07     |
+| std       | 2,689.9     | 0.52          | 0.76            | 1,233.26   |
+| min       | 125         | 0.00          | 0.00            | 17.46      |
+| 25 %      | 494         | 0.02          | 0.02            | 214.98     |
+| 50 %      | 750         | 0.10          | 0.14            | 434.05     |
+| 75 %      | 1,587       | 0.21          | 0.30            | 659.12     |
+| max       | 18,803      | 11.07         | 16.52           | 17,273.18  |
+
+The distributions of distance, CO₂ and cost are **strongly right-skewed** (large gap between the median and the mean / maximum). This is typical for business travel data and motivates the use of log scales in the univariate distribution charts.
+
+### Univariate Analysis — Categorical Variables
+
+Counts of trips by `person_type`, `transport_mode`, `haul`, `business_unit`, `travel_purpose` and `train_alternative_available`:
+
+- **Person type:** employee = 21,285 · guest = 4,242
+- **Transport mode:** flight = 18,757 · train = 4,505 · rental_car = 1,411 · bus = 854
+- **Haul:** short haul = 12,024 · ground = 6,770 · long haul = 3,804 · mid haul = 2,929
+- **Business unit:** BU1 = 6,821 · BU3 = 6,719 · BU2 = 6,164 · BU4 = 5,823
+- **Travel purpose:** client_meeting = 6,975 · internal_meeting = 5,828 · workshop = 3,791 · training = 3,612 · trade_fair = 2,722 · site_visit = 2,599
+
+> **[PLATZHALTER: `fig_4_1_categorical_counts.png` — 2×3 grid of bar plots: trip counts per category for the six categorical variables above.]**
+
+### Univariate Analysis — Numeric Variables
+
+Distance and CO₂ are heavily right-tailed; log-scaled boxplots per transport mode make the differences between flights and ground transport visible.
+
+> **[PLATZHALTER: `fig_4_2_numeric_boxplots.png` — boxplots (log y-axis) of `km` and `CO2e RFI2 (t)` per `transport_mode`.]**
+
+### Temporal Development
+
+Aggregating on a yearly level reveals the **COVID-19 drop in 2020–2021** and the subsequent recovery. Annual trip counts and CO₂ totals (RFI 2.7):
+
+| Year | Trips | CO₂ RFI2.7 (t) |
+| ---- | ----- | -------------- |
+| 2017 | 3,446 | 1,437.0        |
+| 2018 | 3,366 | 1,354.9        |
+| 2019 | 3,637 | 1,957.6        |
+| 2020 | 820   | 455.1          |
+| 2021 | 531   | 172.5          |
+| 2022 | 2,396 | 1,047.0        |
+| 2023 | 3,610 | 1,600.4        |
+| 2024 | 3,713 | 1,346.0        |
+| 2025 | 4,005 | 1,457.4        |
+| 2026 | 3     | 0.0            |
+
+(2026 only contains the first few January days, hence the very small counts — the full year 2026 is what the dashboard *plans* against, using `input_data.xlsx`.)
+
+> **[PLATZHALTER: `fig_5_1_yearly_bars.png` — 2×2 bar grid: trips / km / CO₂ / cost per year.]**
+>
+> **[PLATZHALTER: `fig_5_2_monthly_by_mode.png` — line plot: monthly CO₂ (RFI 2.7) coloured by transport mode, showing the 2020–21 collapse and recovery.]**
+
+### Bivariate / Multivariate Relationships
+
+#### Distance vs. CO₂ by transport mode
+
+A log-log scatter (sample of 5,000 points) shows the expected near-linear relationship between distance and CO₂, with **flights sitting clearly above ground modes** at the same distance.
+
+> **[PLATZHALTER: `fig_6_1_km_vs_co2.png` — log-log scatter `km` vs `CO2e RFI2.7 (t)` coloured by transport mode.]**
+
+#### CO₂ and cost per Business Unit
+
+Aggregated over 2017–2026 (cleaned data):
+
+> **[PLATZHALTER: `fig_6_2_bu_aggregates.png` — table or grouped bars: trips / CO₂ / cost / km per BU.]**
+
+#### Travel purpose × transport mode
+
+A heatmap of trip counts shows that **flights dominate every purpose** except short internal meetings, where train usage is more visible.
+
+> **[PLATZHALTER: `fig_6_3_purpose_mode_heatmap.png` — heatmap `travel_purpose` × `transport_mode` with trip counts.]**
+
+#### Flights with an available train alternative ("avoidable" flights)
+
+This is one of the central insights driving the dashboard's modal-shift recommendation.
+
+| Metric                                                  | Value         |
+| ------------------------------------------------------- | ------------- |
+| Total flights                                           | 18,757        |
+| Flights with `train_alternative_available == True`      | 6,530 (34.8 %) |
+| Avoidable CO₂ (RFI 2.7, cumulative)                     | 753.5 t       |
+| Avoidable cost (cumulative)                             | CHF 2,880,568 |
+
+> **[PLATZHALTER: `fig_6_4_avoidable_co2_per_year.png` — yearly bar chart of avoidable CO₂ from flights with a train alternative.]**
+
+### Geographic Analysis
+
+Top arrival countries by trip count and by CO₂, plus top routes ("departure → arrival") and top route *pairs* (collapsed by direction):
+
+> **[PLATZHALTER: `fig_7_1_top_countries.png` — side-by-side bars: top 15 arrival countries by trip count and by CO₂ (RFI 2.7).]**
+>
+> **[PLATZHALTER: `fig_7_2_top_routes.png` — horizontal bar chart of the 20 most-flown routes.]**
+>
+> **[PLATZHALTER: `fig_7_3_top_route_pairs.png` — top 20 route *pairs* (alphabetically canonicalised), stacked by outbound / return direction.]**
+
+### CO₂ Budget Comparison (Actual vs. Budget)
+
+For the per-BU budget comparison, the subunit-level budgets in `co2_budgets` are aggregated to BU level via the rule `Subunit X.Y → BUX`, then joined with the actual yearly emissions:
+
+> **[PLATZHALTER: `fig_8_1_actual_vs_budget.png` — small-multiples line chart per BU: actual CO₂ vs. budget over 2020–2025; 2026 covered by the assumption-based `budget_2026` sheet.]**
+
+### Initial Findings
+
+- The data set covers **~25,500 trips** over **2017–2026** for four transport modes.
+- **Flights** dominate both trip count and CO₂ emissions; **34.8 %** of all flights have a realistic train alternative, accounting for **753.5 t** of avoidable CO₂ — a clear lever for the dashboard.
+- The CO₂ distribution is **strongly right-skewed**: a few long-haul flights drive a disproportionate share of emissions.
+- A pronounced **COVID-19 dip in 2020–2021** is followed by a steady recovery; 2025 trip volume already exceeds 2017 / 2018 levels.
+- BUs differ markedly in travel volume and CO₂ share — combined with the 2026 budget assumption, this directly motivates the gauge / banner / KPI layout of the dashboard.
+- Data quality of the cleaned reference is high: no missing values, no duplicates and no negative numeric values.
+
+---
+
+---
+
+## Processed Data (in-memory, generated by the dashboard)
+
+These data structures are not stored on disk — they are computed by `app.py` on every run from the cleaned reference file and the uploaded planned-trips file.
 
 ### Overview Processed Datasets
 
-| Name | Source | Storage Location |
-|---|---|---|
-| `route_averages` | Generated from Historical Reference Data | In-memory (Pandas DataFrame) |
-| `estimated_original` | Planned Trips enriched with `route_averages` | In-memory (Exportable via UI) |
-| `alts_original` | Filtered subset of `estimated_original` | In-memory (Exportable via UI) |
-
----
+| Name                 | Source                                       | Storage Location              |
+| -------------------- | -------------------------------------------- | ----------------------------- |
+| `route_averages`     | Generated from cleaned historical reference  | In-memory (pandas DataFrame)  |
+| `estimated_original` | Planned trips enriched with `route_averages` | In-memory (exportable via UI) |
+| `alts_original`      | Filtered subset of `estimated_original`      | In-memory (exportable via UI) |
 
 ### Details Processed Dataset 1: Route Averages (`route_averages`)
 
-- **Description:** An aggregated lookup table created by grouping historical data by `departure_iata`, `arrival_iata`, and `transport_mode`.
-- **Processing Steps:** Calculates the mean CO₂ (`avg_co2`), mean distance (`avg_km`), and average cost per route/mode. It also extracts the first available geographical coordinates (`dep_lat`, `dep_lon`, etc.) for mapping purposes.
-
----
+- **Description:** Lookup table created by grouping the cleaned historical data by `departure_iata`, `arrival_iata` and `transport_mode`.
+- **Processing Steps:** Calculates mean CO₂ (`avg_co2`), mean distance (`avg_km`) and mean cost per route × mode. Also extracts the first available geographic coordinates (`dep_lat`, `dep_lon`, `arr_lat`, `arr_lon`) for mapping.
 
 ### Details Processed Dataset 2: Enriched Input (`estimated_original`)
 
-- **Description:** The planned trips dataset transformed into a complete analytical set.
+- **Description:** The user-supplied planned trips transformed into a complete analytical set.
 - **Processing Steps:**
-  1. The user's input data is merged (Left Join) with `route_averages` on origin, destination, and mode.
-  2. **Imputation:** If the planned trip lacks a CO₂ value, it is populated using the historical `avg_co2` for that specific route and mode, resulting in the `estimated_co2` column. Missing geographical coordinates are filled using the same method.
+  1. Left-join the user input with `route_averages` on `(departure_iata, arrival_iata, transport_mode)`.
+  2. **Imputation:** if a planned trip lacks a CO₂ value, populate `estimated_co2` using `avg_co2` for that exact route + mode. Missing coordinates are filled the same way.
 
----
+### Details Processed Dataset 3: Modal-Shift Alternatives (`alts_original`)
 
-### Details Processed Dataset 3: Modal Shift Alternatives (`alts_original`)
-
-- **Description:** Identifies exactly which planned flights can be substituted with greener alternatives.
+- **Description:** Identifies which planned flights could be substituted by a greener mode (train, bus, rental car).
 - **Processing Steps:**
-  1. Filters `estimated_original` for flights.
-  2. Joins these flights with `route_averages` where the mode is *not* a flight.
-  3. Filters for instances where `alt_co2` < `estimated_co2`.
-  4. Calculates `saving_t` (absolute reduction) and `saving_pct` (relative reduction).
-  5. If multiple alternatives exist (e.g., train and bus), it sorts and selects the single best alternative (maximum `saving_t`) for that original trip row.
-  6. This processed set feeds the **"Apply alternatives"** scenario toggle in the dashboard.
+  1. Filter `estimated_original` for `transport_mode == 'flight'`.
+  2. Join these flights with `route_averages` where the alternative mode is *not* flight.
+  3. Keep rows where `alt_co2 < estimated_co2`.
+  4. Compute `saving_t` (absolute) and `saving_pct` (relative).
+  5. If multiple alternatives exist (e.g. train *and* bus), sort by `saving_t` and keep the single best alternative per original trip.
+  6. The resulting set feeds the **"Apply alternatives"** scenario toggle in the dashboard.

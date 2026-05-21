@@ -15,10 +15,12 @@ The implemented prototype preserves the concept, with three refinements. The BU 
 
 
 ## Data-to-Visual Mapping
-The dashboard draws on two processed tables produced from the source files: a historical reference table and a planned-trips table. The CO₂ metric used for all calculations is user-selectable (CO₂e RFI2, CO₂e RFI2.7), so the dashboard adapts to whichever standard the organisation reports against. The variables most frequently mapped are origin and destination (IATA codes), mode, distance, business_unit, trip_count, and co2_kg.
+## Data-to-Visual Mapping
+The dashboard draws on two processed tables produced from the source files: a historical reference table (≈25,500 trips, used to derive route × mode averages and BU budgets) and a planned-trips table (the uploaded scenario, here 2,096 trips). The CO₂ metric used for all calculations is user-selectable between CO₂e RFI2 (t) and CO₂e RFI2.7 (t), so the dashboard adapts to whichever radiative-forcing standard the organisation reports against. The variables most frequently mapped are origin and destination (IATA codes), mode, distance, business_unit, trip_count, and co2_kg.
 The mapping below follows the order in which the views appear in the dashboard.
 
 *Table 1: Data-to-visual mapping overview.*
+
 | View / Chart | Data variables | Mark type | Visual channels | Scale |
 |---|---|---|---|---|
 | Overview KPI cards | total_co2, budget_total, reduction_potential, trip_count | text (numeric) | position (card grid), colour hue (green = headroom / under budget) | quantitative, categorical status |
@@ -42,7 +44,9 @@ Two semantic palettes run through the dashboard.
 A traffic-light palette (green / yellow / red) encodes budget status and is used in the gauge zones, the status banners, and the green saving-percentage column in the reduction-levers table. The colours are mapped to fixed thresholds (under 85%, approaching 85–100%, over 100% of budget), so colour carries information independent of legend lookup.
 A categorical mode palette distinguishes transport modes consistently across every view that involves modal choice: green for train, blue for bus, red for flight, orange for rental car. The same mapping is reused in the connection map, the route deep-dive chart, the polyline inset, and the per-mode comparison cards, which lets the user transfer meaning across views without re-reading legends. Red is reserved for flights because they are also the carbon-heavy default the dashboard is designed to challenge, which makes the semantic and the categorical encoding reinforce each other.
 The four Business Units use a distinct categorical BU palette (blue, purple, teal, magenta) that is intentionally orthogonal to the mode palette, so BU identity and transport mode never collide on the same view. All palettes were chosen to remain distinguishable under common colour-vision deficiencies, and the green/red traffic-light is reinforced by position and explicit text labels rather than carried by colour alone.
-Two notes on changes I made versus the previous draft, all driven by the code:
+
+
+
 
 
 

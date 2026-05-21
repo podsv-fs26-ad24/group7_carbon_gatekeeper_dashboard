@@ -56,6 +56,43 @@ The Streamlit column system reflows column groups when the viewport narrows, so 
 
 
 ## Interaction Design
+## Interaction Design
+The dashboard is intentionally low on controls: every interaction either changes which data is loaded, narrows a view, opens a detailed comparison, or switches between the *as-planned* and *optimised* scenario.
+
+### Interaction techniques
+**File upload (selection):** the sidebar accepts a required historical reference file and an optional planned-trips file. The historical file drives route averages and budgets; the planned-trips file defines the scenario being analysed. This is the entry point for all subsequent views.
+
+**CO₂ metric switch (filtering):** a radio selector toggles between CO₂e RFI2 and CO₂e RFI2.7, propagating through every calculation so the entire dashboard re-renders against the chosen accounting standard. Supports the Sustainability Manager's reporting needs, where the applicable standard varies by audience.
+
+**Region selector (filtering):** a dropdown above the connection map re-projects the geography between World, Europe, Americas, and Asia views. Supports the Travel Manager's task of inspecting concentration patterns at the relevant scale.
+
+**Row selection in the reduction-levers table (drill-down):** clicking a row loads that origin/destination into the route deep-dive below, populating the map inset, combo chart, and per-mode cards. This is the most cognitively important interaction: it converts a ranked saving opportunity into a comparable, defensible recommendation — exactly what the Travel Manager needs to justify a mode-shift decision.
+
+**Apply alternatives (scenario toggle):** the primary button below the table switches the dashboard into the optimised scenario, recomputing the KPIs, headline banner, BU gauges, BU bar chart, and geographic map under the assumption that every flight with a greener alternative has been switched. A reset button restores the as-planned scenario. This single interaction operationalises the *action* objective of the project.
+
+**Hover (details-on-demand):** every chart exposes hover tooltips with per-route, per-BU, or per-mode detail, supporting exploratory inspection without leaving the view.
+
+### Input modalities
+All interactions are mouse-driven: file pickers, dropdowns, radio buttons, table-row clicks, button clicks, and hover. Streamlit's components are keyboard-accessible by default. There are no custom shortcuts, search fields, or touch gestures — the dashboard is built for a desktop browser.
+
+### State management
+Streamlit's session state persists two things across reruns: the active scenario (`as_planned` / `optimised`) and the selected deep-dive route. Pressing **Apply alternatives** writes `scenario = optimised`; the reset button clears it. Table-row selection writes the route into session state before the deep-dive widgets render, so the deep-dive updates within the same interaction without a second click. File uploads are cached so re-runs do not re-parse the Excel files.
+
+### Feedback and transitions
+Feedback is immediate and visual rather than animated. Switching to the optimised scenario triggers a green banner stating the number of flights shifted and the tonnes saved, and all dependent views re-render with the new values. Row selection highlights the active row and reveals the deep-dive section below with a header that names the route and flags whether each mode's value is historical or distance-estimated. Status banners across the dashboard use the same green / yellow / red logic so that interaction feedback never introduces a new visual language.
+
+### Contribution to user value
+Cognitively, the row-click drill-down and hover tooltips reduce the effort of comparing alternatives by keeping all relevant information on one screen. Communicatively, the **Apply alternatives** toggle translates a long list of route-level savings into a single, dashboard-wide answer to *what would change if we acted on this?* — the question Management needs answered without inspecting individual trips. Experientially, the combination of immediate feedback, plain-language banners, and the easily resettable scenario gives the user confidence to explore the optimised view without fear of losing their place.
+
+
+
+
+
+
+
+
+
+
 If the visualization product includes interactive elements, document them here:
 
 * **Interaction techniques**: Selection, filtering, zooming, panning, brushing, details-on-demand, drill-down, etc.

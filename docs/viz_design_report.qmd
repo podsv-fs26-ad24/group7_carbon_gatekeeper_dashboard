@@ -53,20 +53,8 @@ Navigation is implicit rather than menu-driven: the user scrolls through the fou
 ### Responsive design
 The Streamlit column system reflows column groups when the viewport narrows, so the 4-column KPI row, the 3:2 gauge/bar split, and the 2:3:2 deep-dive split collapse into stacked rows on smaller screens. Plotly figures use `use_container_width=True` to fill the available column, and the gauges scale by row rather than by absolute width. The sidebar collapses on narrow viewports, leaving the main canvas full-width. The layout is optimised for desktop use (the primary working context for the Sustainability and Travel Manager personas) and remains readable on tablets, but is not designed for mobile-first use.
 
-*See the Figure X below for an annotated wireframe of the overall composition.*
-
 ![Annotated low-fidelity wireframe of the dashboard composition. Grey labels mark layout structure; pink dashed arrows mark coordinated-view links.](pics/wireframe.svg){#fig-wireframe width=100%}
 
-
-
-Describe how individual views are composed into the overall visualization product:
-
-* **Spatial arrangement**: How are views arranged on the screen or page? Grid layout, free-form, scrollable narrative, etc.
-* **Coordination between views**: Are views linked (e.g. brushing and linking, shared filters, coordinated highlighting)?
-* **Hierarchy and navigation**: How does the user navigate between different levels of detail or different thematic sections?
-* **Responsive design**: How does the layout adapt to different screen sizes and devices, if applicable?
-
-Include annotated wireframes or layout sketches to illustrate the composition.
 
 ## Interaction Design
 If the visualization product includes interactive elements, document them here:

@@ -55,8 +55,7 @@ The Streamlit column system reflows column groups when the viewport narrows, so 
 
 *See the Figure X below for an annotated wireframe of the overall composition.*
 
-docs/pics/wireframe.svg
-
+![Annotated low-fidelity wireframe of the dashboard composition. Grey labels mark layout structure; pink dashed arrows mark coordinated-view links.](pics/wireframe.svg){#fig-wireframe width=100%}
 
 
 

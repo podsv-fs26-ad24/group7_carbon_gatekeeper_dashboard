@@ -33,40 +33,9 @@ The mapping below follows the order in which the views appear in the dashboard.
 | Per-mode comparison cards | mode, co2_per_pax, duration, delta_vs_flight | numeric label + coloured side-bar | vertical position (rank by CO₂), colour hue (mode), arrow symbol (▼/▲ vs. flight) | categorical, quantitative |
 
 
-### Marks and channels
-The dashboard relies on a small, deliberately repeated vocabulary of marks. Bars and arc segments carry the quantitative comparisons (CO₂ vs. budget, mode vs. mode), using length and angular position as the primary channels because both are high-accuracy encodings for magnitude. Lines are used for spatial flows on the map, where line width encodes CO₂ volume and colour hue encodes transport mode. Points mark origin and destination airports without further encoding. Text marks carry the KPI values and the verbalised status messages, which act as direct labels rather than channels.
-
-### Scale and axis design
-CO₂ is consistently shown on linear scales across the dashboard. The BU bar chart uses a shared linear x-axis in tonnes so that bars are directly comparable across units. The route deep-dive uses a dual linear axis, with CO₂ per passenger on the left y-axis and duration on the right, because the two metrics have different units but the user needs to read them in parallel. The geographic map uses a natural earth projection for the world view and mercator for the regional views (Europe, Americas, Asia), chosen to balance shape fidelity with familiar orientation at the regional scale. Categorical scales are used for transport mode, Business Unit, and origin/destination. Axes are labelled in plain units (CO2 (t), CO2 (kg/pax), Duration (h)) and gauge ticks are placed at intervals that align with the underlying budget for that BU.
-
 ### Colour design
-Two semantic palettes run through the dashboard.
-A traffic-light palette (green / yellow / red) encodes budget status and is used in the gauge zones, the status banners, and the green saving-percentage column in the reduction-levers table. The colours are mapped to fixed thresholds (under 85%, approaching 85–100%, over 100% of budget), so colour carries information independent of legend lookup.
-A categorical mode palette distinguishes transport modes consistently across every view that involves modal choice: green for train, blue for bus, red for flight, orange for rental car. The same mapping is reused in the connection map, the route deep-dive chart, the polyline inset, and the per-mode comparison cards, which lets the user transfer meaning across views without re-reading legends. Red is reserved for flights because they are also the carbon-heavy default the dashboard is designed to challenge, which makes the semantic and the categorical encoding reinforce each other.
-The four Business Units use a distinct categorical BU palette (blue, purple, teal, magenta) that is intentionally orthogonal to the mode palette, so BU identity and transport mode never collide on the same view. All palettes were chosen to remain distinguishable under common colour-vision deficiencies, and the green/red traffic-light is reinforced by position and explicit text labels rather than carried by colour alone.
+Two semantic palettes run through the dashboard. A traffic-light palette (green / yellow / red) encodes budget status across the gauge zones, the status banner, and the saving column in the reduction-levers table, with fixed thresholds (under 85%, approaching 85–100%, over 100%) so colour carries information independent of legend lookup. A categorical mode palette (green = train, blue = bus, red = flight, orange = rental car) is reused across the connection map, the deep-dive chart, the polyline inset, and the per-mode cards, letting users transfer meaning across views without re-reading legends. Red is reserved for flights because they are also the carbon-heavy default the dashboard is designed to challenge, so the semantic and categorical encodings reinforce each other. The four Business Units use a separate categorical palette (blue, purple, teal, magenta) that is orthogonal to the mode palette, and the green/red traffic-light is reinforced by position and explicit text labels to remain readable under common colour-vision deficiencies.
 
-
-
-
-
-
-
-Document the mapping of data variables to visual channels. For each view or chart in the visualization product, describe:
-
-* **Data variables**: Which variables from the processed datasets (see [Data Report](data_report.qmd)) are represented?
-* **Marks**: What geometric primitives are used to represent data items – points, lines, areas, volumes?
-* **Visual channels**: How are data attributes encoded – position, length, angle, area, colour hue, colour saturation, brightness, shape, orientation, texture?
-* **Scale and axis design**: What scales are used (linear, logarithmic, categorical, temporal)? How are axes labelled and annotated?
-* **Colour design**: What colour palette is used and why? Consider colour-blindness accessibility (e.g. using `viridis`, `ColorBrewer` palettes) and semantic colour mappings (e.g. red for negative, green for positive).
-
-A tabular overview can help provide a quick summary:
-
-: Data-to-visual mapping overview. {#tbl-encoding-overview}
-
-| View / Chart | Data variables | Mark type | Visual channels | Scale |
-|---|---|---|---|---|
-| e.g. Sales by Region | region (cat.), revenue (quant.) | bar | x-position, length, colour hue | categorical, linear |
-| ... | ... | ... | ... | ... |
 
 ## Layout and Composition
 Describe how individual views are composed into the overall visualization product:

@@ -23,8 +23,8 @@ The mapping below follows the order in which the views appear in the dashboard.
 | View / Chart | Data variables | Mark type | Visual channels | Scale |
 |---|---|---|---|---|
 | Overview KPI cards | total_co2, budget_total, reduction_potential, trip_count | numeric label | colour hue (green = under budget / red = over), text size (value vs. label hierarchy) | quantitative, categorical status |
-| Status banner | budget_utilisation (%) | numeric label + background fill | colour hue (green / yellow / red) | categorical (traffic-light) |
-| BU gauges (one per BU) | actual_co2, bu_budget | arc segment + tick mark | angular position (CO₂ value), colour hue (status zone), tick position (budget threshold) | linear (0 → max), categorical zone |
+| Status banner | budget_utilisation (%) | text label + background fill | colour hue (green / yellow / red) | categorical (traffic-light) |
+| BU gauges (one per BU) | actual_co2, bu_budget | arc segment | angular position (CO₂ value), colour hue (status zone), zone segments (under 85% / 85–100% / over budget) | linear (0 → max), categorical zone |
 | BU bar chart | business_unit, actual_co2, saving_potential, bu_budget | stacked horizontal bar + dotted reference line | vertical position (business unit), length (CO₂), texture (solid = current / hatched = saving), colour hue (BU identity), horizontal position of marker (budget) | categorical (BU), linear (tonnes) |
 | Geographic distribution map | origin, destination (coordinates), mode, route_co2 | great-circle line + point | spatial position (lat/lon), line width (CO₂), colour hue (mode) | geographic (natural earth / mercator), linear (width), categorical (mode) |
 | Reduction-levers table | origin, destination, alternative_mode, flight_count, avg_flight_co2, avg_alt_co2, saving_t, saving_pct | table row + selectable | vertical position (rank by saving), colour hue (green saving % column) | categorical, linear |

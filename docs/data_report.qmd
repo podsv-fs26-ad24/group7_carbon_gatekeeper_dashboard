@@ -2,7 +2,7 @@
 
 This data report documents all data used in the **Carbon Gatekeeper Dashboard** project. It covers the identification and acquisition of relevant data sources and the exploratory data analysis (EDA) performed to understand data quality and structure. Together, these two parts cover the *Data Acquisition and Exploration* phase of the project.
 
-The report ensures **traceability and reproducibility** of the results — in particular, how the historical travel records were prepared, how the CO₂ budgets for 2026 were derived, and how planned trips are merged with the historical reference data to calculate emissions and modal-shift potentials in the dashboard.
+The report ensures **traceability and reproducibility** of the results, in particular, how the historical travel records were prepared, and how the CO₂ budgets for 2026 were derived.
 
 > **Data pipeline at a glance**
 >
@@ -199,7 +199,7 @@ Distance and CO₂ are heavily right-tailed; log-scaled boxplots per transport m
 
 #### Travel Purpose and Transport Modes
 
-A heatmap of trip counts shows that **flights dominate every purpose** except short internal meetings, where train usage is more visible.
+A heatmap of trip counts shows that **flights dominate every purpose**.
 
 ![](pics/travel_purpose_transport_mode.png)
 
@@ -219,7 +219,7 @@ Top arrival countries by trip count, ("departure → arrival") and top route *pa
 
 ### CO₂ Budget Comparison (Actual vs. Budget)
 
-For the per-BU budget comparison, the subunit-level budgets in `co2_budgets` are aggregated to BU level via the rule `Subunit X.Y → BUX`, then joined with the actual yearly emissions:
+For the per-BU budget comparison, the subunit-level budgets in `co2_budgets` are aggregated to BU level via the rule `Subunit X.Y → BUX`, then compared with the actual yearly emissions:
 
 ![](pics/budget_comparison.png)
 

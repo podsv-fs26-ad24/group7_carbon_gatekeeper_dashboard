@@ -176,7 +176,7 @@ Counts of trips by `person_type`, `transport_mode`, `haul`, `business_unit`, `tr
 - **Business unit:** BU1 = 6,821 · BU3 = 6,719 · BU2 = 6,164 · BU4 = 5,823
 - **Travel purpose:** client_meeting = 6,975 · internal_meeting = 5,828 · workshop = 3,791 · training = 3,612 · trade_fair = 2,722 · site_visit = 2,599
 
-![](pics/univariate_analysis.png){ width=100% }
+![](pics/univariate_analysis.png)
 
 ### Univariate Analysis — Numeric Variables
 
@@ -185,8 +185,6 @@ Distance and CO₂ are heavily right-tailed; log-scaled boxplots per transport m
 ![](pics/numerical_variables.png)
 
 ### Temporal Development
-
-Aggregating on a yearly level reveals the **COVID-19 drop in 2020–2021** and the subsequent recovery. Annual trip counts and CO₂ totals (RFI 2.7):
 
 | Year | Trips | CO₂ RFI2.7 (t) |
 | ---- | ----- | -------------- |
@@ -203,29 +201,15 @@ Aggregating on a yearly level reveals the **COVID-19 drop in 2020–2021** and t
 
 (2026 only contains the first few January days, hence the very small counts — the full year 2026 is what the dashboard *plans* against, using `input_data.xlsx`.)
 
-> **[PLATZHALTER: `fig_5_1_yearly_bars.png` — 2×2 bar grid: trips / km / CO₂ / cost per year.]**
->
-> **[PLATZHALTER: `fig_5_2_monthly_by_mode.png` — line plot: monthly CO₂ (RFI 2.7) coloured by transport mode, showing the 2020–21 collapse and recovery.]**
-
 ### Bivariate / Multivariate Relationships
 
-#### Distance vs. CO₂ by transport mode
-
-A log-log scatter (sample of 5,000 points) shows the expected near-linear relationship between distance and CO₂, with **flights sitting clearly above ground modes** at the same distance.
-
-> **[PLATZHALTER: `fig_6_1_km_vs_co2.png` — log-log scatter `km` vs `CO2e RFI2.7 (t)` coloured by transport mode.]**
-
-#### CO₂ and cost per Business Unit
-
-Aggregated over 2017–2026 (cleaned data):
-
-> **[PLATZHALTER: `fig_6_2_bu_aggregates.png` — table or grouped bars: trips / CO₂ / cost / km per BU.]**
-
-#### Travel purpose × transport mode
+#### Travel Purpose and Transport Modes
 
 A heatmap of trip counts shows that **flights dominate every purpose** except short internal meetings, where train usage is more visible.
 
-> **[PLATZHALTER: `fig_6_3_purpose_mode_heatmap.png` — heatmap `travel_purpose` × `transport_mode` with trip counts.]**
+![](pics/travel_purpose_transport_mode.png)
+
+#### CO₂ and cost per Business Unit
 
 #### Flights with an available train alternative ("avoidable" flights)
 
@@ -238,30 +222,25 @@ This is one of the central insights driving the dashboard's modal-shift recommen
 | Avoidable CO₂ (RFI 2.7, cumulative)                     | 753.5 t       |
 | Avoidable cost (cumulative)                             | CHF 2,880,568 |
 
-> **[PLATZHALTER: `fig_6_4_avoidable_co2_per_year.png` — yearly bar chart of avoidable CO₂ from flights with a train alternative.]**
+![](pics/avoidable_co2_emissions.png)
 
 ### Geographic Analysis
 
 Top arrival countries by trip count and by CO₂, plus top routes ("departure → arrival") and top route *pairs* (collapsed by direction):
 
-> **[PLATZHALTER: `fig_7_1_top_countries.png` — side-by-side bars: top 15 arrival countries by trip count and by CO₂ (RFI 2.7).]**
->
-> **[PLATZHALTER: `fig_7_2_top_routes.png` — horizontal bar chart of the 20 most-flown routes.]**
->
-> **[PLATZHALTER: `fig_7_3_top_route_pairs.png` — top 20 route *pairs* (alphabetically canonicalised), stacked by outbound / return direction.]**
+![](pics/geographical_analysis.png)
 
 ### CO₂ Budget Comparison (Actual vs. Budget)
 
 For the per-BU budget comparison, the subunit-level budgets in `co2_budgets` are aggregated to BU level via the rule `Subunit X.Y → BUX`, then joined with the actual yearly emissions:
 
-> **[PLATZHALTER: `fig_8_1_actual_vs_budget.png` — small-multiples line chart per BU: actual CO₂ vs. budget over 2020–2025; 2026 covered by the assumption-based `budget_2026` sheet.]**
+![](pics/budget_comparison.png)
 
 ### Initial Findings
 
 - The data set covers **~25,500 trips** over **2017–2026** for four transport modes.
 - **Flights** dominate both trip count and CO₂ emissions; **34.8 %** of all flights have a realistic train alternative, accounting for **753.5 t** of avoidable CO₂ — a clear lever for the dashboard.
 - The CO₂ distribution is **strongly right-skewed**: a few long-haul flights drive a disproportionate share of emissions.
-- A pronounced **COVID-19 dip in 2020–2021** is followed by a steady recovery; 2025 trip volume already exceeds 2017 / 2018 levels.
 - BUs differ markedly in travel volume and CO₂ share — combined with the 2026 budget assumption, this directly motivates the gauge / banner / KPI layout of the dashboard.
 - Data quality of the cleaned reference is high: no missing values, no duplicates and no negative numeric values.
 

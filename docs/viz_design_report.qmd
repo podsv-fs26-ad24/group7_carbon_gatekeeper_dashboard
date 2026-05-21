@@ -2,7 +2,14 @@
 This report documents the visual encoding and design decisions made during the development of the visualization product. It translates the visualization concept outlined in the [Project Charta](project_charta.qmd) into concrete design specifications and documents the resulting prototype(s).
 
 ## Design Overview
-Briefly summarise the visualization concept from the Project Charta and describe any refinements or changes that emerged during the design process. Reference the project objectives and user needs that drive the design.
+The visualization concept frames the Carbon Gatekeeper Dashboard as an analytic, web-based decision-support tool that links planned business travel to annual CO₂ budgets. It is built to answer three questions: the current budget status across Business Units, the planned routes with viable lower-carbon alternatives, and the CO₂ that can be saved by shifting transport modes.
+The concept specifies four coordinated views (Overview KPIs, BU Performance with gauges and bar chart, Geographic distribution as a connection map, and Reduction levers as an alternatives table) arranged in an overview → insight → action narrative. The central interaction is an "Apply alternatives" toggle that recomputes the dashboard under an optimized scenario. The design is driven by three qualitative objectives, actionability, transparency, and accessibility, and serves four user roles: Sustainability Manager, Travel Manager, Finance, and Management.
+
+### Refinements during the design process
+The implemented prototype preserves the concept, with three refinements. The BU bar chart was redesigned as a dual-encoding view, where each bar shows current CO₂ (solid) and additional saving potential (hatched) against the budget (dotted reference line), answering three questions in a single chart. A route-level deep-dive was added below the reduction-levers table, so that clicking a route opens a CO₂-vs-duration comparison across all transport modes and turns the table from a ranked list into an evidence-based recommendation view for the Travel Manager. Finally, status was verbalised alongside the gauges through plain-language banners such as "BU1 on track (57% used)", serving the Management persona's need for a fast, interpretation-free read.
+
+
+
 
 ## Data-to-Visual Mapping
 Document the mapping of data variables to visual channels. For each view or chart in the visualization product, describe:

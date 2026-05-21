@@ -6,9 +6,9 @@ The report ensures **traceability and reproducibility** of the results — in pa
 
 > **Data pipeline at a glance**
 >
-> `traveldataexport.xlsx` (raw export)
+> `traveldata-export.xlsx` (raw export)
 >     → manual cleaning in Excel + CO₂-budget assumption for 2026
->     → `traveldataexport_clean.xlsx` (historical reference loaded into the app)
+>     → `traveldata-export_clean.xlsx` (historical reference loaded into the app)
 >     → `input_data.xlsx` (planned trips, used to test the dashboard)
 
 ---
@@ -21,14 +21,14 @@ The report ensures **traceability and reproducibility** of the results — in pa
 
 | Name                      | Source                                              | Storage Location                                |
 | ------------------------- | --------------------------------------------------- | ----------------------------------------------- |
-| Travel Data Export (raw)  | Company travel management system (~25,500 records) | `traveldataexport.xlsx`                         |
+| Travel Data Export (raw)  | Company travel management system (~25,500 records) | `traveldata-export.xlsx`                         |
 | Planned Trips Input       | User-provided operational travel plans              | `input_data.xlsx` (uploaded via Streamlit sidebar) |
 
 ### Details Dataset 1: Historical Reference Data
 
 - **Description:** Original export from the corporate travel management system. Contains **25,527 business-trip segments** over the period **2017-01-01 to 2026-01-05** for four transport modes (flight, train, bus, rental car). Each row represents one trip segment with full geographic information, CO₂ figures calculated under two Radiative Forcing Index (RFI) assumptions, costs in CHF and an organisational mapping (business unit / subunit).
 - **Data Source:** Internal travel and sustainability department.
-- **Data Governance:** Internal business use. No personally identifiable information is stored — only `person_type` (employee vs. guest).
+- **Data Governance:** Internal business use. No personally identifiable information is stored.
 - **File Format:** Excel workbook with three sheets: `travel_data` (25,527 × 27), `data_dictionary` (27 × 3) and `co2_budgets` (100 × 3).
 
 #### Data Catalogue — `travel_data` Sheet
@@ -77,12 +77,9 @@ Note that the raw `co2_budgets` sheet provides values only for **2020–2025** (
 
 ### Details Dataset 2: Planned Trips Input
 
-- **Description:** A dynamic list of planned, upcoming trips provided by the travel or sustainability manager and uploaded into the Streamlit dashboard. Used to estimate future emissions against the 2026 budget and to identify modal-shift potential. If no input file is provided, the dashboard falls back to analysing the historical data itself.
-- **File Format:** Excel workbook with two sheets: `planned_trips` (the trip list) and `instructions` (German-language template guide).
-- **Sample sizes used for testing:**
-    - `input_data.xlsx` — **1,936 planned trips** (compact test set; calibrated to push two BUs over budget and contain several flights with a train alternative).
-    - `input_data_3.xlsx` — **6,429 planned trips** (larger stress-test set).
-- **Required columns:** `business_unit`, `transport_mode`, `departure_iata`, `arrival_iata`. Optional: `date`, `person_type`, `travel_purpose`, `cost_CHF`. Coordinates, kilometres and CO₂ are **not** required — they are enriched on the fly by the dashboard from the historical reference.
+- **Description:** A dynamic list of planned, upcoming trips provided by the travel or sustainability manager and uploaded into the Streamlit dashboard. Used to estimate future emissions against the 2026 budget and to identify modal-shift potential.
+- **File Format:** Excel workbook with two sheets: `planned_trips` (the trip list) and `instructions`.
+- **Required columns:** `business_unit`, `transport_mode`, `departure_iata`, `arrival_iata`. Optional: `date`, `person_type`, `travel_purpose`, `cost_CHF`. Coordinates, kilometres and CO₂ are **not** required, they are enriched on the fly by the dashboard from the historical reference.
 
 #### Data Catalogue — `planned_trips` Sheet
 
@@ -101,7 +98,7 @@ Note that the raw `co2_budgets` sheet provides values only for **2020–2025** (
 
 ## Data Preparation & Cleaning
 
-The raw export `traveldataexport.xlsx` was processed **manually in Microsoft Excel** to produce `traveldataexport_clean.xlsx`. The cleaning step did **not** change any trip records — the cleaned `travel_data` sheet has the same row count (25,527) as the raw export.
+The raw export `traveldata-export.xlsx` was processed **manually in Microsoft Excel** to produce `traveldata-export_clean.xlsx`. The cleaning step did **not** change any trip records, the cleaned `travel_data` sheet has the same row count (25,527) as the raw export.
 
 ### Changes applied
 
@@ -110,7 +107,6 @@ The raw export `traveldataexport.xlsx` was processed **manually in Microsoft Exc
 2. **New column `budget_2026` added to `travel_data`.** The 2026 CO₂ budget of the trip's BU is denormalised onto every trip row to simplify the per-trip budget comparison in the dashboard.
 3. **New sheet `budget_2026` added.** A human-readable budget overview table (per BU, columns *2024*, *2025*, *2026 (Prognose)*, plus a total row).
 4. **`data_dictionary` updated** to reflect the reduced column set (19 entries instead of 27).
-5. **`co2_budgets` sheet kept as-is** — still 100 rows (10 subunits × 10 years 2017–2026).
 
 ### Assumption: CO₂ budget 2026
 
@@ -137,7 +133,6 @@ These values are the reference used by every gauge, banner and KPI in the dashbo
 | `travel_data`     | 25,527 × 20  | Cleaned historical trips with `budget_2026` denormalised onto each row |
 | `data_dictionary` | 19 × 3       | Column descriptions for the cleaned travel data                        |
 | `budget_2026`     | 6 × 4        | Per-BU budgets 2024 / 2025 / 2026                                      |
-| `co2_budgets`     | 100 × 3      | Historical subunit-level budgets 2017–2026                             |
 
 The cleaned `travel_data` sheet contains **no missing values, no duplicate rows, no negative kilometres / CO₂ / costs**, so no further programmatic cleaning was required in the EDA notebook.
 
@@ -145,20 +140,7 @@ The cleaned `travel_data` sheet contains **no missing values, no duplicate rows,
 
 ## Exploratory Data Analysis (EDA)
 
-The exploratory data analysis was carried out in the Jupyter notebook **`eda/eda_travel_data.ipynb`** on the cleaned file `traveldataexport_clean.xlsx`. The goal was to understand structure, distributions and emission drivers of the historical travel data before designing the visualisations.
-
-> Placeholders are marked with **`[PLATZHALTER: …]`** — replace each with the rendered image (or embed the code chunk in Quarto) before publishing.
-
-### Setup & Data Import
-
-The notebook imports `travel_data`, `data_dictionary`, `budget_2026` and `co2_budgets` into pandas DataFrames using `pd.read_excel(...)`. Confirmed shapes:
-
-```
-travel_data:     25,527 rows × 20 columns
-data_dictionary: 19 × 3
-budget_2026:     6 × 4
-co2_budgets:     100 × 3
-```
+The exploratory data analysis was carried out in the Jupyter notebook **`eda/eda_travel_data.ipynb`** on the cleaned file `traveldata-export_clean.xlsx`. The goal was to understand structure, distributions and emission drivers of the historical travel data before designing the visualisations.
 
 ### Data Quality
 
@@ -184,8 +166,6 @@ Summary statistics of the numeric columns:
 | 75 %      | 1,587       | 0.21          | 0.30            | 659.12     |
 | max       | 18,803      | 11.07         | 16.52           | 17,273.18  |
 
-The distributions of distance, CO₂ and cost are **strongly right-skewed** (large gap between the median and the mean / maximum). This is typical for business travel data and motivates the use of log scales in the univariate distribution charts.
-
 ### Univariate Analysis — Categorical Variables
 
 Counts of trips by `person_type`, `transport_mode`, `haul`, `business_unit`, `travel_purpose` and `train_alternative_available`:
@@ -196,7 +176,7 @@ Counts of trips by `person_type`, `transport_mode`, `haul`, `business_unit`, `tr
 - **Business unit:** BU1 = 6,821 · BU3 = 6,719 · BU2 = 6,164 · BU4 = 5,823
 - **Travel purpose:** client_meeting = 6,975 · internal_meeting = 5,828 · workshop = 3,791 · training = 3,612 · trade_fair = 2,722 · site_visit = 2,599
 
-![](pics/univariate_analysis.png){ width=80% }
+![](pics/univariate_analysis.png){ width=100% }
 
 ### Univariate Analysis — Numeric Variables
 

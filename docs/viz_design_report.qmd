@@ -15,23 +15,23 @@ The implemented prototype preserves the concept, with three refinements. The BU 
 
 
 ## Data-to-Visual Mapping
-## Data-to-Visual Mapping
-The dashboard draws on two processed tables produced from the source files: a historical reference table (≈25,500 trips, used to derive route × mode averages and BU budgets) and a planned-trips table (the uploaded scenario, here 2,096 trips). The CO₂ metric used for all calculations is user-selectable between CO₂e RFI2 (t) and CO₂e RFI2.7 (t), so the dashboard adapts to whichever radiative-forcing standard the organisation reports against. The variables most frequently mapped are origin and destination (IATA codes), mode, distance, business_unit, trip_count, and co2_kg.
+The dashboard draws on two processed tables produced from the source files: a historical reference table and a planned-trips table. The CO₂ metric used for all calculations is user-selectable between CO₂e RFI2 (t) and CO₂e RFI2.7 (t), so the dashboard adapts to whichever radiative-forcing standard the organisation reports against. The variables most frequently mapped are origin and destination (IATA codes), mode, distance, business_unit, trip_count, and co2_kg.
 The mapping below follows the order in which the views appear in the dashboard.
 
 *Table 1: Data-to-visual mapping overview.*
 
 | View / Chart | Data variables | Mark type | Visual channels | Scale |
 |---|---|---|---|---|
-| Overview KPI cards | total_co2, budget_total, reduction_potential, trip_count | text (numeric) | position (card grid), colour hue (green = headroom / under budget) | quantitative, categorical status |
-| Status banner | budget_utilisation (%) | text + background fill | colour hue (green / yellow / red) | categorical (traffic-light) |
-| BU gauges (one per BU) | actual_co2, bu_budget | arc segment + tick mark | angular position (value), colour hue (zone), tick (budget threshold) | linear (0 → max), categorical zone |
-| BU bar chart | business_unit, actual_co2, saving_potential, bu_budget | stacked horizontal bar + dotted reference line | length (CO₂), texture (solid = current / hatched = saving), colour hue (BU identity), position (budget marker) | categorical (BU), linear (tonnes) |
-| Geographic distribution map | origin, destination (coordinates), mode, route_co2 | great-circle line + point | spatial position (lat/lon), line width (CO₂), colour hue (mode), point (airport node) | geographic (natural earth / mercator), linear (width), categorical (mode) |
-| Reduction-levers table | origin, destination, alternative_mode, flight_count, avg_flight_co2, avg_alt_co2, saving_t, saving_pct | table row + selectable | position (row order = saving rank), colour hue (saving % in green) | categorical, linear |
-| Route deep-dive (map inset) | origin, destination, mode polylines, duration | line + label | spatial position, colour hue (mode), text (duration) | geographic, categorical |
-| Route deep-dive (combo chart) | mode, co2_per_pax, duration | bar + diamond marker | length (CO₂ on left y-axis), position (duration on right y-axis), colour hue (mode) | categorical, dual linear |
-| Per-mode comparison cards | mode, co2_per_pax, duration, delta_vs_flight | text + coloured side-bar | colour hue (mode), position (vertical stack), text emphasis | categorical, quantitative |
+| Overview KPI cards | total_co2, budget_total, reduction_potential, trip_count | numeric label | colour hue (green = under budget / red = over), text size (value vs. label hierarchy) | quantitative, categorical status |
+| Status banner | budget_utilisation (%) | numeric label + background fill | colour hue (green / yellow / red) | categorical (traffic-light) |
+| BU gauges (one per BU) | actual_co2, bu_budget | arc segment + tick mark | angular position (CO₂ value), colour hue (status zone), tick position (budget threshold) | linear (0 → max), categorical zone |
+| BU bar chart | business_unit, actual_co2, saving_potential, bu_budget | stacked horizontal bar + dotted reference line | vertical position (business unit), length (CO₂), texture (solid = current / hatched = saving), colour hue (BU identity), horizontal position of marker (budget) | categorical (BU), linear (tonnes) |
+| Geographic distribution map | origin, destination (coordinates), mode, route_co2 | great-circle line + point | spatial position (lat/lon), line width (CO₂), colour hue (mode) | geographic (natural earth / mercator), linear (width), categorical (mode) |
+| Reduction-levers table | origin, destination, alternative_mode, flight_count, avg_flight_co2, avg_alt_co2, saving_t, saving_pct | table row + selectable | vertical position (rank by saving), colour hue (green saving % column) | categorical, linear |
+| Route deep-dive (map inset) | origin, destination, mode polylines, duration | line + label | spatial position (lat/lon), colour hue (mode), text (duration label) | geographic, categorical |
+| Route deep-dive (combo chart) | mode, co2_per_pax, duration | bar + diamond marker | horizontal position (mode), bar height (CO₂, left y-axis), marker height (duration, right y-axis), colour hue (mode) | categorical, dual linear |
+| Per-mode comparison cards | mode, co2_per_pax, duration, delta_vs_flight | numeric label + coloured side-bar | vertical position (rank by CO₂), colour hue (mode), arrow symbol (▼/▲ vs. flight) | categorical, quantitative |
+
 
 ### Marks and channels
 The dashboard relies on a small, deliberately repeated vocabulary of marks. Bars and arc segments carry the quantitative comparisons (CO₂ vs. budget, mode vs. mode), using length and angular position as the primary channels because both are high-accuracy encodings for magnitude. Lines are used for spatial flows on the map, where line width encodes CO₂ volume and colour hue encodes transport mode. Points mark origin and destination airports without further encoding. Text marks carry the KPI values and the verbalised status messages, which act as direct labels rather than channels.

@@ -182,7 +182,7 @@ Counts of trips by `person_type`, `transport_mode`, `haul`, `business_unit`, `tr
 
 Distance and CO₂ are heavily right-tailed; log-scaled boxplots per transport mode make the differences between flights and ground transport visible.
 
-![](pics/numerical_variables.png){ width=80% }
+![](pics/numerical_variables.png)
 
 ### Temporal Development
 

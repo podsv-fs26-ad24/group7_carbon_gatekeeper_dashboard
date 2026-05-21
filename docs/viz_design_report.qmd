@@ -12,6 +12,42 @@ The implemented prototype preserves the concept, with three refinements. The BU 
 
 
 ## Data-to-Visual Mapping
+
+
+## Data-to-Visual Mapping
+The dashboard draws on two processed tables produced from the source files: a historical reference table (≈25,500 trips, used to derive route × mode averages and BU budgets) and a planned-trips table (the uploaded scenario, here 2,096 trips). The CO₂ metric used for all calculations is user-selectable (e.g. CO₂e, CO₂e RFI2, CO₂e RFI2.7), so the dashboard adapts to whichever standard the organisation reports against. The variables most frequently mapped are origin and destination (IATA codes), mode, distance, business_unit, trip_count, and co2_kg.
+The mapping below follows the order in which the views appear in the dashboard.
+
+*Table 1: Data-to-visual mapping overview.*
+
+| View / Chart | Data variables | Mark type | Visual channels | Scale |
+|---|---|---|---|---|
+| Overview KPI cards | total_co2, budget_total, reduction_potential, trip_count | text (numeric) | position (card grid), colour hue (green = headroom / under budget) | quantitative, categorical status |
+| Status banner | budget_utilisation (%) | text + background fill | colour hue (green / yellow / red) | categorical (traffic-light) |
+| BU gauges (one per BU) | actual_co2, bu_budget | arc segment + tick mark | angular position (value), colour hue (zone), tick (budget threshold) | linear (0 → max), categorical zone |
+| BU bar chart | business_unit, actual_co2, saving_potential, bu_budget | stacked horizontal bar + dotted reference line | length (CO₂), texture (solid = current / hatched = saving), colour hue (BU identity), position (budget marker) | categorical (BU), linear (tonnes) |
+| Geographic distribution map | origin, destination (coordinates), mode, route_co2 | great-circle line + point | spatial position (lat/lon), line width (CO₂), colour hue (mode), point (airport node) | geographic (Equal Earth), linear (width), categorical (mode) |
+| Reduction-levers table | origin, destination, alternative_mode, flight_count, avg_flight_co2, avg_alt_co2, saving_t, saving_pct | table row + checkbox | position (row order = saving rank), colour hue (saving % in green) | categorical, linear |
+| Route deep-dive (map inset) | origin, destination, mode polylines, duration | line + label | spatial position, colour hue (mode), text (duration) | geographic, categorical |
+| Route deep-dive (combo chart) | mode, co2_per_pax, duration | bar + diamond marker | length (CO₂ on left y-axis), position (duration on right y-axis), colour hue (mode) | categorical, dual linear |
+| Per-mode comparison cards | mode, co2_per_pax, duration, delta_vs_flight | text + coloured side-bar | colour hue (mode), position (vertical stack), text emphasis | categorical, quantitative |
+
+### Marks and channels
+The dashboard relies on a small, deliberately repeated vocabulary of marks. Bars and arc segments carry the quantitative comparisons (CO₂ vs. budget, mode vs. mode), using length and angular position as the primary channels because both are high-accuracy encodings for magnitude. Lines are used for spatial flows on the map, where line width encodes CO₂ volume and colour hue encodes transport mode. Points mark origin and destination airports without further encoding. Text marks carry the KPI values and the verbalised status messages, which act as direct labels rather than channels.
+
+### Scale and axis design
+CO₂ is consistently shown on linear scales across the dashboard. The BU bar chart uses a shared linear x-axis in tonnes so that bars are directly comparable across units. The route deep-dive uses a dual linear axis, with CO₂ per passenger on the left y-axis and duration on the right, because the two metrics have different units but the user needs to read them in parallel. The geographic map uses an Equal Earth projection, chosen over Mercator because it preserves relative area and avoids exaggerating the visual weight of high-latitude intercontinental routes. Categorical scales are used for transport mode, Business Unit, and origin/destination. Axes are labelled in plain units (CO2 (t), CO2 (kg/pax), Duration (h)) and gauge ticks are placed at intervals that align with the underlying budget for that BU.
+
+### Colour design
+Two semantic palettes run through the dashboard.
+A traffic-light palette (green / yellow / red) encodes budget status and is used in the gauge zones, the status banners, and the green saving-percentage column in the reduction-levers table. The colours are mapped to fixed thresholds (under, approaching, over budget), so colour carries information independent of legend lookup.
+A categorical mode palette distinguishes transport modes consistently across every view that involves modal choice: green for train, blue for bus, red for flight, orange for rental car. The same mapping is reused in the connection map, the route deep-dive chart, the polyline inset, and the per-mode comparison cards, which lets the user transfer meaning across views without re-reading legends. Red is reserved for flights because they are also the carbon-heavy default the dashboard is designed to challenge, which makes the semantic and the categorical encoding reinforce each other.
+The four Business Units use a distinct categorical BU palette (blue, purple, teal, magenta) that is intentionally orthogonal to the mode palette, so BU identity and transport mode never collide on the same view. All palettes were chosen to remain distinguishable under common colour-vision deficiencies, and the green/red traffic-light is reinforced by position and explicit text labels rather than carried by colour alone.
+
+
+
+
+
 Document the mapping of data variables to visual channels. For each view or chart in the visualization product, describe:
 
 * **Data variables**: Which variables from the processed datasets (see [Data Report](data_report.qmd)) are represented?

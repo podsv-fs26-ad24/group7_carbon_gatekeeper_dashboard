@@ -56,13 +56,6 @@ The Streamlit column system reflows column groups when the viewport narrows, so 
 *See Figure X for an annotated wireframe of the overall composition.*
 
 
-{
-  "widgetSpec": {
-    "height": "750px",
-    "prompt": "**Objective:** Create an interactive visual wireframe simulation of a modern analytics layout corresponding to the 'Business Travel CO2 Dashboard'. It acts as a live architectural prototype for dashboard layout design.\n\n**Data State:** Layout elements corresponding to a standard dashboard view with a left sidebar panel taking up 25% width and a main canvas area taking up 75% width. Content zones must accurately match structural guidelines (KPI row, structural breakdown, side-by-side geographic/anatomy row, table footer expander).\n\n**Strategy:** Standard Layout.\n\n**Inputs:** \n- Layout Style (Dropdown: 'Clean Wireframe', 'High Contrast Blueprint', 'Minimalist Gray')\n- Toggle Metric Gridlines (Checkbox, default true)\n- Simulation State (Dropdown: 'Baseline Actuals', 'Optimized Forecast')\n\n**Visuals/Behavior:** \nRender a beautiful, high-fidelity browser canvas rendering a visual wireframe architecture. \n- **Left Sidebar Panel:** Draw a vertical container filled with wireframe placeholders for file uploaders, filtering inputs, toggles, and metadata readouts.\n- **Main Dashboard Panel:** \n  - **Row 1 (Header Strip):** Draw a wide, thin metadata strip spanning the top right.\n  - **Row 2 (KPI Cards):** Render a row containing three equally-sized cards containing large numerical metric placeholders and performance trend indicators.\n  - **Row 3 (Gauges):** Render a row with four horizontally aligned boxes containing semi-circular progress or status ring shapes.\n  - **Row 4 (Breakdown):** A wide container visualizing a horizontal bar configuration comparing data blocks.\n  - **Row 5 (Split Module):** Two perfectly symmetric side-by-side panels. The left panel shows a map/scatter skeleton chart with cross lines. The right panel shows fine-grain comparative horizontal meters.\n  - **Row 6 (Actionable Table):** A wide structured list element indicating rows, columns, and data cells simulating deep drill-down actions.\n\nEnsure all text components read with precise functional wireframe labels (e.g., '[METADATA STRIP: Period 2026]', '[KPI: Total CO2 Footprint]', '[BU1 GAUGE - 65% Budget Used]'). All visual components should change styles natively based on the chosen 'Layout Style' parameter."
-  }
-}
-
 
 
 

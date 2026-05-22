@@ -62,7 +62,7 @@ The dashboard is intentionally low on controls: every interaction either changes
 ### Interaction techniques
 **File upload (selection):** the sidebar accepts a required historical reference file and an optional planned-trips file. The historical file drives route averages and budgets; the planned-trips file defines the scenario being analysed. This is the entry point for all subsequent views.
 
-**CO₂ metric switch (filtering):** a radio selector toggles between CO₂e RFI2 and CO₂e RFI2.7, propagating through every calculation so the entire dashboard re-renders against the chosen accounting standard. Supports the Sustainability Manager's reporting needs, where the applicable standard varies by audience.
+**CO₂ metric switch (filtering):** a selector toggles between CO₂e RFI2 and CO₂e RFI2.7, propagating through every calculation so the entire dashboard re-renders against the chosen accounting standard. Supports the Sustainability Manager's reporting needs, where the applicable standard varies by audience.
 
 **Region selector (filtering):** a dropdown above the connection map re-projects the geography between World, Europe, Americas, and Asia views. Supports the Travel Manager's task of inspecting concentration patterns at the relevant scale.
 
@@ -85,24 +85,29 @@ Feedback is immediate and visual rather than animated. Switching to the optimise
 Cognitively, the row-click drill-down and hover tooltips reduce the effort of comparing alternatives by keeping all relevant information on one screen. Communicatively, the **Apply alternatives** toggle translates a long list of route-level savings into a single, dashboard-wide answer to *what would change if we acted on this?* — the question Management needs answered without inspecting individual trips. Experientially, the combination of immediate feedback, plain-language banners, and the easily resettable scenario gives the user confidence to explore the optimised view without fear of losing their place.
 
 
-
-
-
-
-
-
-
-
-If the visualization product includes interactive elements, document them here:
-
-* **Interaction techniques**: Selection, filtering, zooming, panning, brushing, details-on-demand, drill-down, etc.
-* **Input modalities**: Mouse, touch, keyboard shortcuts, search fields, etc.
-* **State management**: How does the system respond to user interactions? What state transitions occur?
-* **Feedback and transitions**: How are changes communicated to the user – animations, highlighting, progressive disclosure?
-
-For each interaction, describe which user task (from the user analysis in the Project Charta) it supports and how it contributes to the cognitive, communicative or experiential value of the product.
-
 ## Visual Style and Aesthetics
+## Visual Style and Aesthetics
+The dashboard follows a restrained visual language: neutral greys for structure, semantic colours only where they carry meaning, and a single typographic family throughout.
+
+### Typography
+Inter (with Arial as fallback) is used across all components, ensuring no font mismatch between Streamlit and Plotly. Four hierarchy levels are used: page title (1.65 rem, 600 weight), section titles (1.05 rem, 600, with a thin bottom border), KPI values (1.8 rem, 700), and body / hint text (0.82–0.95 rem). KPI labels are uppercase at 0.78 rem with letter-spacing to read as identifiers rather than headlines.
+
+### Colour palette
+Three palettes operate independently. The **neutral palette** carries structure: ink `#1F2937`, muted `#6B7280`, border `#E5E7EB`, soft background `#F9FAFB`. The **semantic status palette** carries budget compliance: ok `#10B981`, warn `#F59E0B`, bad `#EF4444`. The **categorical palettes** distinguish two independent dimensions — Business Units (`#2563EB`, `#7C3AED`, `#0891B2`, `#DB2777`) and transport modes (train `#10B981`, bus `#3B82F6`, flight `#EF4444`, rental car `#F59E0B`). Red is deliberately shared between *over budget* and *flight*, since flights are the carbon-heavy default the dashboard is built to challenge.
+
+### Spacing and alignment
+The main canvas is capped at 1400 px. Streamlit's column system provides the horizontal grid; section titles have generous top margins to separate thematic blocks without hard rules, and chart gridlines are kept light (`#E5E7EB`) to avoid visual noise.
+
+### Branding
+The prototype does not integrate an organisational identity. A production version would substitute the BU palette with the organisation's brand colours and add a logo, without altering the rest of the design system.
+
+### Accessibility
+Colour is never the sole carrier of meaning: every status is accompanied by an explicit text label, the BU bar chart uses a hatched texture in addition to colour, and legends are present on every chart. Contrast ratios for the main text/background combinations exceed the WCAG AA 4.5:1 threshold. The categorical palettes were chosen to remain distinguishable under common colour-vision deficiencies.
+
+
+
+
+
 Document the overall visual design language:
 
 * **Typography**: Font families, sizes, hierarchy of text elements (titles, labels, annotations, body text).

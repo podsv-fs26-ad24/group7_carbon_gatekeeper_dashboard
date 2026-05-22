@@ -127,6 +127,28 @@ The source code is maintained in the GitHub repository <https://github.com/podsv
 
 
 ## Design Rationale and Iterations
+## Design Decisions and Rationale
+
+### Design alternatives
+Four alternatives were considered and discarded:
+
+- **Multi-tab layout** instead of a single scrollable page — rejected because tabs let users jump to the action table without first seeing the budget context that makes a saving meaningful.
+- **Four separate regional maps** (as proposed in the Charta) — replaced by a single map with a region dropdown to avoid visual switching and keep the geographic section from dominating the page.
+- **Side-by-side before/after bar charts** — replaced by the dual-encoding bar (solid current + hatched saving + dotted budget) so the saving potential is readable without mental subtraction.
+- **Filter-heavy sidebar** (mode, BU, date, destination) — abandoned because it pushed the dashboard toward an analysis sandbox and conflicted with Management's stated need for "clear indicators, not analysis tools."
+
+### Design rationale
+Each project objective maps onto a specific element: **actionability** through the row-click drill-down and the **Apply alternatives** toggle, **transparency** through the dual-encoded BU bar chart and verbal status banners, **accessibility** through the web deployment and plain-language phrasing. In terms of value, the layout and position-based encodings carry the **cognitive** load (high-accuracy magnitude comparisons on one screen). Plain-language banners carry the **communicative** value by stating a verdict that does not require chart literacy. The easily resettable scenario toggle and immediate cross-view feedback carry the **experiential** value, encouraging exploration without fear of losing context.
+
+### Iteration history
+Three changes during implementation are worth noting. The BU bar chart was redesigned from a single-value bar into the current dual-encoding bar, so the saving potential is visible without first pressing **Apply alternatives**. The route-level deep-dive was added below the reduction-levers table after early reviews indicated that the table alone did not justify a mode-shift recommendation. Plain-language status banners were added alongside the gauges to serve the Management persona's need for clear indicators rather than colour interpretation.
+
+
+
+
+
+
+
 Document key design decisions, alternatives considered and the rationale for the chosen approach. This section ensures traceability and supports the evaluation phase.
 
 * **Design alternatives**: What alternative designs were considered? Sketches, mockups or descriptions of discarded approaches can be valuable for documentation.

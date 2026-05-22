@@ -112,8 +112,6 @@ Colour is never the sole carrier of meaning: every status is accompanied by an e
 The prototype is **high-fidelity**: a fully interactive web implementation rendered from real data, with all four thematic sections, all interactions (scenario toggle, drill-down, region selector, hover), and the responsive Streamlit layout in place.
 
 ### Screenshots and link
-Representative views: the Overview KPIs and status banner (@fig-overview), the BU gauges and bar chart (@fig-bu), the geographic distribution map (@fig-map), the reduction-levers table (@fig-levers), and the route deep-dive (@fig-deepdive).
-
 The prototype is available at: <https://podsv-fs26-ad24.github.io/ad24-7-fancyproject/> *(replace with the actual Streamlit Cloud URL if deployed elsewhere)*.
 
 ### Technology stack
@@ -127,18 +125,6 @@ The prototype is available at: <https://podsv-fs26-ad24.github.io/ad24-7-fancypr
 ### Code and version control
 The source code is maintained in the GitHub repository <https://github.com/podsv-fs26-ad24/ad24-7-fancyproject>, on the `main` branch. The version corresponding to this report is tagged `viz-design-report`.
 
-
-
-
-
-
-
-Document the developed prototype(s):
-
-* **Prototype fidelity**: Low-fidelity (sketches, wireframes), medium-fidelity (static mockups), high-fidelity (interactive implementation)?
-* **Screenshots and/or link**: Include representative screenshots of the prototype. If the prototype is accessible online, provide the URL.
-* **Technology stack**: Tools, libraries and frameworks used for implementation (e.g. D3.js, Plotly, Tableau, Power BI, Streamlit, Observable, etc.).
-* **Code and version control**: Link to the code repository, branch or tag corresponding to the current prototype version.
 
 ## Design Rationale and Iterations
 Document key design decisions, alternatives considered and the rationale for the chosen approach. This section ensures traceability and supports the evaluation phase.

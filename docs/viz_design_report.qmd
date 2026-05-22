@@ -105,18 +105,34 @@ The prototype does not integrate an organisational identity. A production versio
 Colour is never the sole carrier of meaning: every status is accompanied by an explicit text label, the BU bar chart uses a hatched texture in addition to colour, and legends are present on every chart. Contrast ratios for the main text/background combinations exceed the WCAG AA 4.5:1 threshold. The categorical palettes were chosen to remain distinguishable under common colour-vision deficiencies.
 
 
-
-
-
-Document the overall visual design language:
-
-* **Typography**: Font families, sizes, hierarchy of text elements (titles, labels, annotations, body text).
-* **Colour palette**: Primary and secondary colours, background, accent colours. Provide colour codes (hex/RGB).
-* **Spacing and alignment**: Grid system, margins, padding, whitespace strategy.
-* **Branding**: Integration of organisational identity, logos, visual style guides, if applicable.
-* **Accessibility**: Considerations for colour-blindness, contrast ratios, screen reader compatibility, font legibility.
-
 ## Prototype Description
+## Prototype
+
+### Fidelity
+The prototype is **high-fidelity**: a fully interactive web implementation rendered from real data, with all four thematic sections, all interactions (scenario toggle, drill-down, region selector, hover), and the responsive Streamlit layout in place.
+
+### Screenshots and link
+Representative views: the Overview KPIs and status banner (@fig-overview), the BU gauges and bar chart (@fig-bu), the geographic distribution map (@fig-map), the reduction-levers table (@fig-levers), and the route deep-dive (@fig-deepdive).
+
+The prototype is available at: <https://podsv-fs26-ad24.github.io/ad24-7-fancyproject/> *(replace with the actual Streamlit Cloud URL if deployed elsewhere)*.
+
+### Technology stack
+- **Python 3** as the implementation language
+- **Streamlit** for the web app framework and layout
+- **Plotly** (`graph_objects`) for all interactive charts and the connection map
+- **pandas** for data loading, route aggregation, and scenario computation
+- **openpyxl** for Excel I/O
+- **NumPy** for distance calculations (haversine, emission-factor fallback)
+
+### Code and version control
+The source code is maintained in the GitHub repository <https://github.com/podsv-fs26-ad24/ad24-7-fancyproject>, on the `main` branch. The version corresponding to this report is tagged `viz-design-report`.
+
+
+
+
+
+
+
 Document the developed prototype(s):
 
 * **Prototype fidelity**: Low-fidelity (sketches, wireframes), medium-fidelity (static mockups), high-fidelity (interactive implementation)?

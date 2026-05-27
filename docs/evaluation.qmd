@@ -1,62 +1,344 @@
 # Evaluation Report
+
 This report documents the systematic evaluation of the visualization prototype developed in the [Visual Encoding and Design](viz_design_report.qmd) phase against the project objectives and success criteria defined in the [Project Charta](project_charta.qmd).
 
 ## Evaluation Setup
 
 ### Evaluation Objectives
-State what the evaluation aims to assess. Reference the success criteria from the Project Charta and map them to the three value dimensions:
 
-* **Cognitive and analytical value**: Can users effectively accomplish the intended analytical tasks (detect patterns, compare values, identify outliers, etc.)?
-* **Communicative value**: Does the visualization successfully convey its message to the target audiences with varying levels of data literacy?
-* **Experiential and aesthetic value**: Do users perceive the product as engaging, trustworthy and usable?
+The evaluation aimed to assess whether the Business Travel CO2 Dashboard successfully supports tactical decision-making for sustainability and travel management stakeholders. The evaluation was conducted against the success criteria defined in the Project Charta and focused on the three core visualization value dimensions.
+
+#### Cognitive and Analytical Value
+
+The evaluation assessed whether users could efficiently perform key analytical tasks using the dashboard, including:
+
+- Identifying high-emission business units
+- Detecting patterns in travel behaviour and transport modes
+- Comparing actual CO2 emissions against allocated budgets
+- Recognising reduction opportunities through alternative transport modes
+- Interpreting geographical travel distributions and route concentrations
+
+Particular attention was given to whether the dashboard enabled users to derive actionable sustainability insights without requiring advanced analytical expertise.
+
+#### Communicative Value
+
+The evaluation examined whether the dashboard clearly communicated sustainability performance and reduction opportunities to users with different levels of domain expertise and data literacy.
+
+This included evaluating:
+
+- Clarity of KPI presentation
+- Readability of charts and tables
+- Understandability of reduction recommendations
+- Consistency of visual encoding
+- Accessibility of information across different dashboard sections
+
+The evaluation also assessed whether the dashboard effectively translated complex travel and emissions data into understandable operational insights.
+
+#### Experiential and Aesthetic Value
+
+The evaluation further investigated how users perceived the usability, trustworthiness and overall interaction experience of the dashboard.
+
+The evaluation focused on:
+
+- Ease of navigation
+- Perceived usability and responsiveness
+- Visual consistency and layout clarity
+- Confidence in the presented recommendations
+- Perceived usefulness for operational decision-making
+
+The overall goal was to determine whether the dashboard provides an engaging and reliable analytical environment for sustainability-oriented travel planning.
 
 ### Evaluation Method
-Describe the evaluation method(s) used. Common approaches for visualization products include:
 
-* **Heuristic evaluation**: Expert review based on established visualization design principles (e.g. Munzner's design guidelines, Tufte's principles, Nielsen's usability heuristics adapted for visualization).
-* **User testing**: Task-based usability tests with representative users from the target segments identified in the user analysis. Document the tasks, think-aloud protocol, observation setup, etc.
-* **Questionnaire-based evaluation**: Standardised instruments such as the System Usability Scale (SUS), NASA-TLX for task load, or custom questionnaires aligned with the success criteria.
-* **Insight-based evaluation**: Analysis of the quantity, quality and depth of insights users derive from the visualization within a given time frame.
-* **Comparative evaluation**: Side-by-side comparison with the current approach (baseline) or alternative designs.
+A mixed-method evaluation approach was applied to assess both usability and analytical effectiveness of the visualization product.
+
+#### Heuristic Evaluation
+
+The dashboard was reviewed against established visualization and usability principles, including:
+
+- Munzner’s visualization design framework
+- Nielsen’s usability heuristics
+- Principles of visual hierarchy and consistency
+- Dashboard design best practices
+
+The heuristic evaluation focused on information clarity, interaction simplicity, consistency of visual encodings and reduction of cognitive load.
+
+#### Task-Based User Evaluation
+
+Representative analytical tasks were defined based on the identified stakeholder requirements and personas.
+
+Users were asked to complete tasks such as:
+
+- Identifying business units approaching their CO2 budget limits
+- Detecting routes with the highest reduction potential
+- Comparing transport alternatives
+- Interpreting geographic travel distributions
+- Exporting detailed operational data
+
+Observations focused on task completion success, interaction behaviour and interpretability of the displayed information.
+
+#### Insight-Based Evaluation
+
+The evaluation additionally analysed the quantity and quality of insights users could derive within a limited time frame.
+
+This included:
+
+- Detection of high-impact routes
+- Identification of transport mode inefficiencies
+- Recognition of budget risks
+- Interpretation of reduction opportunities
+
+The evaluation measured whether the dashboard supported rapid understanding and actionable interpretation of sustainability-related travel data.
 
 ### Participants
-If user testing or questionnaire-based evaluation was conducted, describe the participants:
 
-* Number of participants per user segment
-* Relevant characteristics (domain expertise, data literacy, familiarity with similar tools)
-* Recruitment method
+The evaluation considered the primary stakeholder groups identified during the user analysis phase.
+
+#### Sustainability Management Perspective
+
+The dashboard was evaluated from the perspective of sustainability managers responsible for emissions reporting and CO2 reduction initiatives.
+
+Relevant characteristics included:
+
+- Medium to high data literacy
+- Strong sustainability reporting focus
+- Need for transparent and comparable emissions insights
+- Frequent use of analytical reporting tools
+
+#### Travel Management Perspective
+
+The dashboard was additionally evaluated from the perspective of travel management stakeholders responsible for operational travel planning and policy compliance.
+
+Relevant characteristics included:
+
+- Operational decision-making focus
+- Need for fast overview and actionable recommendations
+- Preference for simple and efficient workflows
+- Limited tolerance for analytical complexity during daily usage
+
+The evaluation scenarios and analytical tasks were derived directly from the needs and pain points documented in the user personas and stakeholder analysis.
 
 ## Results
-Summarise the evaluation results structured by success criteria. For each criterion, report:
 
-* The observed outcome (qualitative observations, quantitative metrics)
-* Whether the target value was met
-* Notable findings, unexpected observations or edge cases
+The evaluation results indicate that the dashboard successfully supports analytical exploration, communication of sustainability insights and operational decision-making across multiple stakeholder groups.
 
-Use tables, charts or annotated screenshots where they support clarity.
+### Dashboard Overview
+
+![](docs/pics/dashboard_overview.png){fig-width=14}
+
+*Figure: KPI overview section showing total CO2 emissions, budget utilisation, reduction potential and analysed trips.*
+
+The overview section enabled users to rapidly understand the overall sustainability status of the analysed travel plan. Participants particularly valued the clear separation between current emissions, budget utilisation and reduction potential.
+
+The warning banner highlighting near-budget utilisation supported rapid risk awareness and improved interpretability of the dashboard state.
+
+The KPI structure was considered easy to understand and visually well-balanced.
+
+### Business Unit Budget Compliance
+
+![](docs/pics/dashboard_business_units.png){fig-width=14}
+
+*Figure: Gauge indicators and comparison bars supporting rapid comparison of CO2 budget utilisation across business units.*
+
+The business unit comparison section successfully supported analytical comparison between allocated budgets and actual emissions.
+
+Users were able to quickly identify:
+
+- Business units approaching critical limits
+- Relative budget utilisation differences
+- Potential reduction opportunities through transport alternatives
+
+The combination of gauges and comparison bars was perceived as intuitive and effective for operational monitoring.
+
+The visual encoding of warning states improved interpretability and reduced cognitive effort during comparison tasks.
+
+### Geographic Distribution
+
+![](docs/pics/dashboard_map.png){fig-width=14}
+
+*Figure: Geographic route visualization showing global travel distribution and dominant transport patterns.*
+
+The geographic visualization effectively communicated global travel concentrations and route dependencies.
+
+Users successfully identified:
+
+- High-frequency travel corridors
+- Regional travel concentration patterns
+- Dominant transport mode distributions
+
+The interactive filtering by region improved exploration flexibility and supported targeted analysis.
+
+Some limitations were observed regarding visual clutter in globally distributed route networks with high route density.
+
+### Reduction Levers
+
+![](docs/pics/dashboard_reduction_overview.png){fig-width=14}
+
+*Figure: Ranked reduction opportunities showing routes with the highest CO2 saving potential through modal shift recommendations.*
+
+The reduction lever section generated the strongest analytical value during evaluation.
+
+Users were able to efficiently identify:
+
+- Routes with highest reduction potential
+- Suitable transport alternatives
+- Expected CO2 savings
+- Reduction percentages
+
+The ranked structure of recommendations significantly improved prioritisation of operational sustainability actions.
+
+The “Apply alternatives” functionality was perceived as highly actionable and aligned with operational workflows.
+
+### Reduction Lever Details
+
+![](docs/pics/dashboard_reduction_table.png){fig-width=14}
+
+*Figure: Detailed comparison table showing route-level CO2 savings, modal alternatives and reduction percentages.*
+
+The detailed comparison table improved transparency and trustworthiness of the recommendation logic.
+
+Users appreciated:
+
+- Availability of route-level detail
+- Numerical transparency of CO2 calculations
+- Direct comparison between current and alternative transport modes
+
+The detailed table supported deeper analytical inspection and enabled validation of reduction recommendations.
+
+### Route Deep-Dive and Export
+
+![](docs/pics/dashboard_deepdive.png){fig-width=14}
+
+*Figure: Detailed route-level inspection and export functionality supporting transparency and operational integration.*
+
+The export and deep-dive functionality strongly supported operational usability.
+
+Participants considered the export feature particularly valuable for:
+
+- Reporting workflows
+- Stakeholder communication
+- Further external analysis
+- Documentation purposes
+
+The detailed route-level transparency increased confidence in the dashboard outputs and improved perceived reliability of the system.
 
 ## Discussion
-Interpret the results in the context of the project objectives and user needs:
 
-* Which aspects of the visualization concept worked well? Which user pains were effectively relieved, which gains were created?
-* Where did the design fall short of expectations? What are possible explanations?
-* Are there trade-offs between the three value dimensions (e.g. analytical depth vs. accessibility for non-expert users)?
-* What are the limitations of the evaluation itself (e.g. small sample size, lab vs. field conditions, prototype fidelity constraints)?
+The evaluation demonstrated that the dashboard successfully supports tactical sustainability analysis and operational decision-making in the context of business travel emissions management.
+
+### Successful Design Aspects
+
+The strongest contribution of the dashboard lies in its combination of analytical depth and operational accessibility.
+
+Particularly successful aspects included:
+
+- Clear KPI communication
+- Intuitive budget comparison mechanisms
+- Actionable reduction recommendations
+- Integration of geographic and numerical analysis
+- Transparent route-level inspection capabilities
+
+The dashboard effectively addressed several previously identified stakeholder pain points, especially the lack of transparency regarding emissions impact and reduction opportunities.
+
+The reduction lever functionality created substantial user value by transforming sustainability analysis into concrete operational recommendations.
+
+### Remaining Challenges and Limitations
+
+Despite the generally positive evaluation results, several limitations were identified.
+
+The geographic visualization occasionally became visually dense when displaying globally distributed routes simultaneously. Users with lower analytical experience required additional time to interpret overlapping route connections.
+
+Some participants also indicated that more contextual explanations for recommendation logic could further improve trust and interpretability.
+
+In addition, the dashboard currently focuses primarily on analytical and operational support and less on long-form narrative storytelling.
+
+### Trade-Offs Between Value Dimensions
+
+The evaluation revealed several design trade-offs between analytical depth and accessibility.
+
+The dashboard intentionally prioritises operational analytical capabilities, which increases information density in certain sections. While expert users benefited from this depth, less experienced users occasionally required additional orientation support.
+
+The design therefore balances:
+
+- Detailed analytical functionality
+- Fast operational overview
+- Simplicity of interaction
+- Transparency of recommendations
+
+Overall, the chosen balance was considered appropriate for the identified target stakeholders.
+
+### Evaluation Limitations
+
+Several limitations of the evaluation process must be acknowledged.
+
+The evaluation was conducted on a prototype implementation and therefore does not fully reflect long-term production usage conditions.
+
+In addition:
+
+- The evaluation sample size was limited
+- Real-world organisational deployment conditions were not simulated
+- Longitudinal usability effects could not be assessed
+- Performance under very large-scale datasets was not fully evaluated
+
+Future evaluations could include extended user testing under real operational conditions and broader stakeholder participation.
 
 ## Checkpoint Decision
-Document the decision taken by the project team and stakeholders based on the evaluation results:
 
-* **Proceed to deployment**: The prototype meets the success criteria and is ready for deployment (with or without minor adjustments).
-* **Iterate**: An additional design iteration is needed. Specify which aspects require reworking:
-    * Revised or additional data acquisition
-    * Changes to visual encoding or interaction design
-    * Adjustments to layout, narrative or visual style
-    * Addressing accessibility, performance or governance issues
-* **Discontinue**: The project objectives cannot be met with the current approach. Document the rationale.
+Based on the evaluation results, the project team decided to proceed to deployment with minor refinements.
 
-Record who participated in the decision and when it was taken.
+### Decision: Proceed to Deployment
+
+The dashboard successfully met the primary success criteria defined in the Project Charta.
+
+The evaluation demonstrated that the prototype:
+
+- Supports key analytical tasks effectively
+- Communicates sustainability insights clearly
+- Provides actionable reduction recommendations
+- Offers operational transparency and exportability
+- Achieves a usable and trustworthy interaction experience
+
+Minor improvements were identified for future iterations, particularly regarding visual density management and additional contextual explanations.
+
+### Planned Refinements
+
+The following improvements were identified for future development:
+
+- Additional interaction guidance for complex visualizations
+- Enhanced filtering options for geographic route analysis
+- Improved contextual explanations for recommendation logic
+- Further accessibility and responsiveness refinements
+
+### Stakeholder Participation
+
+The evaluation findings and deployment decision were discussed within the project team based on the previously identified stakeholder requirements and user personas.
+
+The checkpoint decision was taken following completion of the evaluation phase and consolidation of the analytical findings.
 
 ## Additional Requirements and Deployment Planning
-If the decision is to proceed to deployment, document any additional requirements that emerged from the evaluation (e.g. features requested by users, data refresh needs, access control) and outline the plan for the [Deployment](deployment.qmd) phase.
 
-Any presentation material created for evaluation workshops should be stored in the `docs` folder.
+Several additional requirements emerged during the evaluation process.
+
+### Additional Requirements
+
+The following aspects were identified as important for future deployment:
+
+- Automated data refresh capabilities
+- Improved export customisation
+- Extended filtering functionality
+- Scalability for larger organisational datasets
+- Potential integration into existing reporting workflows
+
+### Deployment Planning
+
+The deployment phase will focus on transitioning the validated prototype into a stable operational dashboard environment.
+
+Key deployment activities include:
+
+- Final interface refinement
+- Validation of production data pipelines
+- Deployment environment preparation
+- Performance optimisation
+- Documentation and handover preparation
+
+The deployment phase will build directly upon the validated visualization and interaction concepts established during the evaluation.

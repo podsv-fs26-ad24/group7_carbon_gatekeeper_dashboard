@@ -316,29 +316,6 @@ The evaluation findings and deployment decision were discussed within the projec
 The checkpoint decision was taken following completion of the evaluation phase and consolidation of the analytical findings.
 
 ## Additional Requirements and Deployment Planning
+If the decision is to proceed to deployment, document any additional requirements that emerged from the evaluation (e.g. features requested by users, data refresh needs, access control) and outline the plan for the [Deployment](deployment.qmd) phase.
 
-Several additional requirements emerged during the evaluation process.
-
-### Additional Requirements
-
-The following aspects were identified as important for future deployment:
-
-- Automated data refresh capabilities
-- Improved export customisation
-- Extended filtering functionality
-- Scalability for larger organisational datasets
-- Potential integration into existing reporting workflows
-
-### Deployment Planning
-
-The deployment phase will focus on transitioning the validated prototype into a stable operational dashboard environment.
-
-Key deployment activities include:
-
-- Final interface refinement
-- Validation of production data pipelines
-- Deployment environment preparation
-- Performance optimisation
-- Documentation and handover preparation
-
-The deployment phase will build directly upon the validated visualization and interaction concepts established during the evaluation.
+Any presentation material created for evaluation workshops should be stored in the `docs` folder.

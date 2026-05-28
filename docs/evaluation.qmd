@@ -174,37 +174,19 @@ Some limitations were observed regarding visual clutter in globally distributed 
 
 ![](pics/dashboard_reduction_overview.png){fig-width=14}
 
-*Figure: Ranked reduction opportunities showing routes with the highest CO2 saving potential through modal shift recommendations.*
-
-The reduction lever section generated the strongest analytical value during evaluation.
-
-Users were able to efficiently identify:
-
-- Routes with highest reduction potential
-- Suitable transport alternatives
-- Expected CO2 savings
-- Reduction percentages
-
-The ranked structure of recommendations significantly improved prioritisation of operational sustainability actions.
-
-The “Apply alternatives” functionality was perceived as highly actionable and aligned with operational workflows.
-
-### Reduction Lever Details
+*Figure: Ranked reduction opportunities showing routes with the highest CO2 saving potential and recommended transport alternatives.*
 
 ![](pics/dashboard_reduction_table.png){fig-width=14}
 
-*Figure: Detailed comparison table showing route-level CO2 savings, modal alternatives and reduction percentages.*
+*Figure: Detailed route-level comparison including modal alternatives, estimated CO2 savings and reduction percentages.*
 
-The detailed comparison table improved transparency and trustworthiness of the recommendation logic.
+The reduction lever section generated particularly high analytical value during the evaluation process.
 
-Users appreciated:
+Users were able to efficiently identify high-impact routes, compare transport alternatives and assess potential CO2 reductions on both aggregated and detailed levels.
 
-- Availability of route-level detail
-- Numerical transparency of CO2 calculations
-- Direct comparison between current and alternative transport modes
+The ranked recommendation structure supported rapid prioritisation of sustainability actions, while the detailed comparison table improved transparency and trust in the recommendation logic through route-level numerical comparisons.
 
-The detailed table supported deeper analytical inspection and enabled validation of reduction recommendations.
-
+Participants particularly valued the actionable workflow integration provided by the “Apply alternatives” functionality and the ability to validate recommendations through detailed operational data.
 ### Route Deep-Dive and Export
 
 ![](pics/dashboard_deepdive.png){fig-width=14}

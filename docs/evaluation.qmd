@@ -269,6 +269,14 @@ Future evaluations could include extended user testing under real operational co
 
 Based on the evaluation results, the project team decided to proceed to deployment with minor refinements.
 
+The evaluation demonstrated that the dashboard successfully supports the identified analytical and communicative objectives defined in the Project Charta. Users were able to efficiently identify high-emission routes, compare budget utilisation across business units and evaluate potential CO2 reduction strategies through alternative transport modes.
+
+Minor improvements were identified during the evaluation process, primarily related to layout refinement, usability optimisation and clearer interaction guidance for first-time users. However, these issues did not significantly impact the overall usability or analytical effectiveness of the system.
+
+The project team therefore concluded that the prototype is sufficiently mature to continue into the deployment phase while incorporating incremental usability refinements.
+
+The decision was taken collectively by the project team following completion of the evaluation activities and review of the observed findings.
+
 ### Decision: Proceed to Deployment
 
 The dashboard successfully met the primary success criteria defined in the Project Charta.

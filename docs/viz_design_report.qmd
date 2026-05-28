@@ -96,7 +96,7 @@ Colour is never the sole carrier of meaning: every status is accompanied by an e
 ## Prototype Description
 **Fidelity.** The prototype is **high-fidelity**: a fully interactive web implementation rendered from real data, with all four thematic sections, all interactions (scenario toggle, drill-down, region selector, hover), and the responsive Streamlit layout in place.
 
-**Screenshots and link.** The prototype is available at: <https://podsv-fs26-ad24.github.io/ad24-7-fancyproject/> *(replace with the actual Streamlit Cloud URL if deployed elsewhere)*.
+**Screenshots and link.** The prototype is available at: <https://podsv-fs26-ad24.github.io/ad24-7-fancyproject/>.
 
 ### Technology stack
 - **Python 3** as the implementation language

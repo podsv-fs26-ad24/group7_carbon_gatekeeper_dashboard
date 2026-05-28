@@ -1,139 +1,98 @@
-# Sample Project
-This is a template for a data visualization project using Python, uv for environment and package management and Quarto for documentation.
+# Project Overview
 
-To adapt to your individual project change `sample` to the respective project name in the commands below
+This document is the single source of truth for the **Carbon Gatekeeper Dashboard**. It provides a high-level orientation for anyone onboarding to the project or seeking a concise understanding of what the dashboard does, who it serves, how it is built, and where it currently stands. For phase-specific detail, see the [Project Charta](project_charta.qmd), [Data Report](data_report.qmd), [Visualization Design Report](viz_design_report.qmd), and [Evaluation Report](evaluation.qmd).
 
-Adapt the `LICENSE` as required.
+---
 
-> To do: Provide a brief description of the project here.
+## 1. Executive Summary
 
-## Project Organisation
-The visualization product development is organised according to the following process model:
+The **Carbon Gatekeeper Dashboard** is an interactive, web-based decision-support tool that links planned business travel directly to annual CO₂ budgets, moving the organization from retrospective emissions reporting to tactical, point-of-planning guidance. It is built for sustainability and travel management stakeholders who need to monitor budget compliance across Business Units, identify lower-carbon alternatives for planned routes, and quantify the savings achievable by shifting transport modes. The tool is delivered as a high-fidelity Streamlit prototype, accessible through a standard web browser with no additional software.
 
-![The visualization product development process](docs/pics/vizproductprocess.png)
+---
 
-Code and configurations used in the different project phases are stored in the correspoding subfolders. Documentation artefacts in the form of a Quarto project are provided in `docs`.
+## 2. Core Objectives & Value Proposition
 
-| Phase | Code folders | Documentation section | `docs`-File |
-|:-------|:---|:---|:---|
-| Project Understanding | -  | Project Charta | project_charta.qmd  |
-| Data Acquisition and Exploration | `eda` | Data Report | data_report.qmd  |
-| Visual Encoding and Design | `encoding-design`  | Visual Encoding and Design | viz_encoding_design.qmd  |
-| Evaluation | `evaluation`  | Evaluation | evaluation.qmd  |
-| Deployment | `deployment` | Deployment | deplyoment.qmd |
+The dashboard addresses a central organizational gap: travel emissions are typically reviewed *after* the fact, when reduction opportunities have already passed. The Carbon Gatekeeper closes that gap by analyzing planned itineraries against historical route data **before** trips are taken. It is designed to answer three core questions:
 
+- **What is the current CO₂ budget status and compliance across all Business Units (BUs)?**
+- **Which specific routes in our planned travel have viable, lower-carbon alternatives based on historical data?**
+- **How much CO₂ can we save by actively shifting to these recommended transport modes?**
 
-> To do: Adjust accoding to your specific project needs - ensure consistency with readme, documentation, etc.
+The value proposition rests on three qualitative objectives that run through every design decision:
 
-> To do: add link to documentation website for convenience.
+- **Actionability** — The tool automatically scans user-provided trip lists, surfaces routes with the largest aggregate saving potential, and lets users apply a mode-shift scenario in a single click.
+- **Transparency** — A clear, hierarchical view of emissions lets users distinguish performance between Business Units and inspect the route-level evidence behind every recommendation.
+- **Accessibility** — Stakeholders reach the tool directly through a web browser via a Streamlit deployment, without manual data pulls from separate systems.
 
+**Out of scope:** predictive forecasting of future travel demand, full-footprint accounting beyond business travel, and automated enforcement (the tool recommends and alerts but does not block bookings).
 
-See section `Quarto Setup and Usage` for instructions on how to build and serve the documentation website using Quarto.
+---
 
-## Python Environment Setup and Management with uv
-Make sure to have uv installed: https://docs.astral.sh/uv/getting-started/installation/
+## 3. Target Audience / Personas
 
-After cloning the repository,  create the python environment with all dependencies based on the `.python-version`, `pyproject.toml` and `uv.lock` files by running
-```bash
-uv sync
-```
+The dashboard serves four stakeholder roles, each with a distinct relationship to the data:
 
-To add new dependencies, use
-```bash
-uv add <package>
-```
-which will add the package to `pyproject.toml` and update the `uv.lock` file. You can also specify a version, e.g. `uv add pandas==2.0.3`.
+- **Sustainability Manager** *(primary user, very high interest)* — Responsible for company-wide CO₂ monitoring and sustainability reporting. Needs to answer, at any moment, whether the company is within budget and, if not, why. The dashboard replaces manual evaluations and underpins reporting to senior management and external stakeholders.
+- **Travel Manager** *(very high interest)* — Owns operational coordination of all business travel and policy enforcement. Uses the dashboard as a daily tool to spot policy violations — for example, flights booked where a viable alternative connection existed. The transport-mode comparison is the core feature for this role.
+- **Finance / Controlling** *(medium interest)* — Tracks travel-related spend and budget adherence across departments. Focuses on cost KPIs (total spend, cost per trip, per department, per transport mode); CO₂ data is secondary unless emission-related fees become budget-relevant.
+- **Management / Corporate** *(high interest)* — Senior decision-makers who set CO₂ reduction goals and budget thresholds. They require a clean, top-down summary — current budget consumption, overall spend, and trend direction — and value the transport-mode comparison for strategic decisions such as mandatory rail policies below a distance threshold. They need clear indicators, not analysis tools.
 
-Remove packages with
-```bash
-uv remove <package>
-```
+These roles are further grounded in two literature-based personas, **Daniel Schmid** and **Anna Meier**, documented in the Project Charta.
 
-Commit changes to `pyproject.toml` and `uv.lock` files into version control.
+---
 
-Run `uv sync` after pulling changes to update the local environment.
+## 4. High-Level Architecture & Tech Stack
 
-Whenever the python environment is used, make sure to prefix every command that uses python with `uv run`, e.g.
-```bash
-uv run python script.py
-```
+The dashboard is a **single-page Streamlit application** built entirely in Python, with a persistent left sidebar for inputs and a fixed-width main canvas (max 1400 px).
 
-You can also run
-```bash 
-source .venv/bin/activate
-```
-to activate the project Python environment in a terminal session in order to avoid having to prefix every command.
+**Technology stack:**
 
-## Runtime Configuration with Environment Variables
-The environment variables are specified in a .env-File, which is never commited into version control, as it may contain secrets. The repo just contains the file `.env.template` to demonstrate how environment variables are specified.
+- **Python 3** — implementation language
+- **Streamlit** — web app framework, layout, and session state management
+- **Plotly** (`graph_objects`) — all interactive charts and the geographic connection map
+- **pandas** — data loading, route aggregation, and scenario computation
+- **NumPy** — distance calculations (haversine) and emission-factor fallback
+- **openpyxl** — Excel I/O
 
-You have to create a local copy of `.env.template` in the project root folder and the easiest is to just rename it to `.env`.
+**Data flow.** The pipeline runs from a raw export to two processed tables consumed by the app:
 
-The content of the .env-file is then read by the pypi-dependency: `python-dotenv`. Usage:
-```python
-import os
-from dotenv import load_dotenv
-```
+1. `traveldata-export.xlsx` (raw export, ~25,500 records) → manual cleaning in Excel plus a derived 2026 CO₂-budget assumption →
+2. `traveldata-export_clean.xlsx` — the **historical reference file** loaded into the app (`travel_data` 25,527 × 20, `data_dictionary`, `budget_2026`). This establishes route averages and per-BU budgets.
+3. `input_data.xlsx` — the **planned-trips file** uploaded via the Streamlit sidebar, defining the scenario being analyzed.
 
-`load_dotenv` reads the .env-file and sets the environment variables:
+At runtime, the user uploads the required historical reference file and an optional planned-trips file. Planned trips need only `business_unit`, `transport_mode`, `departure_iata`, and `arrival_iata`; coordinates, distance, and CO₂ are **enriched on the fly** from the historical reference. All calculations use a user-selectable CO₂ metric — **CO₂e RFI2 (t)** or **CO₂e RFI2.7 (t)** — so the dashboard adapts to whichever radiative-forcing standard the organization reports against.
 
-```python
-load_dotenv()
-```
+**Reproducibility & deployment.** Source is maintained in the [GitHub repository](https://github.com/podsv-fs26-ad24/ad24-7-fancyproject) on `main`. The documentation is a Quarto project deployed to GitHub Pages via a GitHub Actions workflow, using frozen (`_freeze`) computation results so the runner needs no Python environment.
 
-which can then be accessed (assuming the file contains a line `SAMPLE_VAR=<some value>`):
+---
 
-```python
-os.environ['SAMPLE_VAR']
-```
+## 5. Key Features & Modules
 
-## Quarto Setup and Usage
+The dashboard is organized into four thematic sections following an **overview → insight → action** narrative, stacked vertically with implicit scroll-based navigation:
 
-### Setup Quarto
+- **Overview KPIs** — Top-level cards showing total CO₂ emissions, budget utilization, reduction potential, and number of analyzed trips, accompanied by a traffic-light status banner. A metadata strip states source file, period, trip count, scenario, reference, and method up front.
+- **BU Performance (Gauges & Bar Chart)** — Four per-BU gauges using green / yellow / red zones (under, approaching, over budget), paired with a dual-encoding horizontal bar chart where each bar shows current CO₂ (solid) and additional saving potential (hatched) against the budget (dotted reference line). Plain-language banners verbalize status (e.g., *"BU1 on track (57% used)"*) for the Management persona.
+- **Geographic Distribution (Connection Map)** — A great-circle connection map where line width scales with route CO₂ and color encodes transport mode, with a region selector (World, Europe, Americas, Asia) for re-projection.
+- **Reduction Levers (Alternatives Table & Route Deep-Dive)** — A ranked table of routes with viable alternatives, detailing flight count, average flight CO₂, average alternative CO₂, saving in tonnes, and saving percentage. Selecting a row opens a route-level deep-dive (map inset, CO₂-vs-duration combo chart, and per-mode comparison cards) that turns the ranked list into an evidence-based recommendation.
 
-1. [Install Quarto](https://quarto.org/docs/get-started/)
-2. Optional: [quarto-extension for VS Code](https://marketplace.visualstudio.com/items?itemName=quarto.quarto)
-3. If working with svg files and pdf output you will need to install rsvg-convert:
-    * On macOS: `brew install librsvg`
-    * On Windows using chocolatey:
-      * [Install chocolatey](https://chocolatey.org/install#individual)
-      * [Install rsvg-convert](https://community.chocolatey.org/packages/rsvg-convert): `choco install rsvg-convert`
+**Central interaction — "Apply alternatives" toggle.** A single button switches the dashboard into an *optimised scenario*, recomputing the KPIs, banner, BU gauges, bar chart, and map under the assumption that every flight with a greener alternative has been shifted. A reset button restores the *as-planned* view. Supporting interactions include the CO₂-metric switch, the region selector, row-level drill-down, hover details-on-demand, and a collapsed *Detail data and export* expander for raw row-level data.
 
-Source `*.qmd` and configuration files are in the `docs` folder. The Quarto project configuration is in `docs/_quarto.yml`.
+---
 
-With embedded python code chunks that perform computations, you need to make sure that the python environment is activated when rendering. This can be done by prefixing the render command with `uv run`, e.g.:
-```bash
-uv run quarto render
-```
+## 6. Current Project State & Next Steps
 
-### Working on the Documentation
+**Currently functional.** The prototype is **high-fidelity** — a fully interactive web implementation rendered from real data, with all four thematic sections, all interactions (scenario toggle, drill-down, region selector, hover), responsive Streamlit layout, and data export in place. A systematic evaluation (heuristic, task-based, and insight-based methods, assessed against the Charta's success criteria) found that the dashboard supports key analytical tasks, communicates sustainability insights clearly, provides actionable reduction recommendations, and offers transparent, exportable outputs. The reduction-lever functionality generated the strongest analytical value during testing.
 
-1. Make changes to the `.qmd` source files in the `docs` folder
-2. Make sure the project Python environment is activated (see Python environment setup and management)
-3. Preview locally: `quarto preview` from the `docs` folder
-4. Build the documentation website: `uv run quarto render` from the `docs` folder. This renders to `docs/build`
-5. Check the website locally by opening `docs/build/index.html` in a browser
+Based on these results, the team's checkpoint decision was to **proceed to deployment with minor refinements**.
 
-### Deployment of the Documentation to GitHub Pages
+**Known limitations.** The geographic map can become visually dense with globally distributed, high-density route networks; less experienced users occasionally needed additional orientation; and some participants wanted more contextual explanation of the recommendation logic. The evaluation itself was prototype-based with a limited sample, did not simulate real organizational deployment, and did not fully test performance on very large datasets.
 
-The documentation website is deployed to GitHub Pages via a GitHub Actions workflow (`.github/workflows/publish.yml`). Every push to `main` triggers the workflow, which renders the Quarto project and deploys the result.
+**Planned refinements & next steps (future work):**
 
-The setting `execute: freeze: auto` in `_quarto.yml` ensures that Python computations are only executed locally. Results are cached in `docs/_freeze` and checked into the repository, so the GitHub Actions runner does not need Python — it uses the pre-computed results.
+- Additional interaction guidance for complex visualizations
+- Enhanced filtering options for geographic route analysis
+- Improved contextual explanations for recommendation logic
+- Further accessibility and responsiveness refinements
+- The **Deployment** phase (`deployment.qmd`), including data-refresh needs, access control, and any additional requirements surfaced during evaluation
 
-#### Initial Setup (once)
-
-1. In the GitHub repository settings, go to **Settings > Pages** and set the source to **GitHub Actions**
-2. Render locally so that `_freeze` contains cached computation results:
-   ```bash
-   cd docs && uv run quarto render
-   ```
-3. Push the changes to `main`
-
-The `_freeze` directory and the workflow file `.github/workflows/publish.yml` should already be tracked in the repository.
-
-
-#### Publishing Updates
-
-1. Build the website locally: `uv run quarto render` from the `docs` folder. This updates `docs/build` (gitignored) and `docs/_freeze` (checked in)
-2. Check the website locally by opening `docs/build/index.html`
-3. Commit and push all updated files (including `docs/_freeze`) to `main`. The GitHub Actions workflow will render and deploy the site automatically
+> **Note on assumptions.** The 2026 CO₂ budgets are derived rather than supplied: the team continued the historical reduction trajectory of roughly −10 % per year (2020–2025), setting each BU's 2026 budget to *2025 × 0.9*. These figures (BU1 207.5 t, BU2 211.5 t, BU3 240.9 t, BU4 181.2 t; total 841.1 t) are the reference used by every gauge, banner, and KPI.

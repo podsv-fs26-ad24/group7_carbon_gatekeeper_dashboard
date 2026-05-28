@@ -299,6 +299,23 @@ The evaluation findings and deployment decision were discussed within the projec
 The checkpoint decision was taken following completion of the evaluation phase and consolidation of the analytical findings.
 
 ## Additional Requirements and Deployment Planning
-If the decision is to proceed to deployment, document any additional requirements that emerged from the evaluation (e.g. features requested by users, data refresh needs, access control) and outline the plan for the [Deployment](deployment.qmd) phase.
 
-Any presentation material created for evaluation workshops should be stored in the `docs` folder.
+The evaluation process revealed several additional requirements and considerations for the deployment phase of the dashboard.
+
+Participants highlighted the importance of reliable and regularly updated travel and emissions data to ensure trustworthy operational decision support. Automated refresh pipelines and validation checks should therefore be considered for future production deployment.
+
+Several users also expressed the need for role-specific access and filtering capabilities. Sustainability managers primarily required aggregated strategic views, while operational travel managers preferred access to detailed route-level and exportable planning data.
+
+The export functionality was positively received and should remain part of the deployed solution, particularly for integration into existing reporting and approval workflows.
+
+From a technical perspective, the current Streamlit-based implementation provides a suitable prototype deployment environment. Future deployment iterations should additionally consider:
+
+- Authentication and access control
+- Automated data refresh scheduling
+- Improved performance for larger datasets
+- Integration with existing travel management systems
+- Responsive layout optimisation for different screen sizes
+
+The deployment phase will focus on transforming the evaluated prototype into a maintainable and operationally usable dashboard environment while preserving the analytical clarity and usability validated during the evaluation process.
+
+All evaluation material and supporting assets are stored within the `docs` folder of the project repository.

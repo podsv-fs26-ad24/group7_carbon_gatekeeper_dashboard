@@ -187,6 +187,7 @@ Users were able to efficiently identify high-impact routes, compare transport al
 The ranked recommendation structure supported rapid prioritisation of sustainability actions, while the detailed comparison table improved transparency and trust in the recommendation logic through route-level numerical comparisons.
 
 Participants particularly valued the actionable workflow integration provided by the “Apply alternatives” functionality and the ability to validate recommendations through detailed operational data.
+
 ### Route Deep-Dive and Export
 
 ![](pics/dashboard_deepdive.png){fig-width=14}

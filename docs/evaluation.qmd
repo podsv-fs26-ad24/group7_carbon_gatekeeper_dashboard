@@ -124,7 +124,7 @@ The evaluation results indicate that the dashboard successfully supports analyti
 
 ### Dashboard Overview
 
-![](docs/pics/dashboard_overview.png){fig-width=14}
+![](pics/dashboard_overview.png){fig-width=14}
 
 *Figure: KPI overview section showing total CO2 emissions, budget utilisation, reduction potential and analysed trips.*
 
@@ -136,7 +136,7 @@ The KPI structure was considered easy to understand and visually well-balanced.
 
 ### Business Unit Budget Compliance
 
-![](docs/pics/dashboard_business_units.png){fig-width=14}
+![](pics/dashboard_business_units.png){fig-width=14}
 
 *Figure: Gauge indicators and comparison bars supporting rapid comparison of CO2 budget utilisation across business units.*
 
@@ -154,7 +154,7 @@ The visual encoding of warning states improved interpretability and reduced cogn
 
 ### Geographic Distribution
 
-![](docs/pics/dashboard_map.png){fig-width=14}
+![](pics/dashboard_map.png){fig-width=14}
 
 *Figure: Geographic route visualization showing global travel distribution and dominant transport patterns.*
 
@@ -172,7 +172,7 @@ Some limitations were observed regarding visual clutter in globally distributed 
 
 ### Reduction Levers
 
-![](docs/pics/dashboard_reduction_overview.png){fig-width=14}
+![](pics/dashboard_reduction_overview.png){fig-width=14}
 
 *Figure: Ranked reduction opportunities showing routes with the highest CO2 saving potential through modal shift recommendations.*
 
@@ -191,7 +191,7 @@ The “Apply alternatives” functionality was perceived as highly actionable an
 
 ### Reduction Lever Details
 
-![](docs/pics/dashboard_reduction_table.png){fig-width=14}
+![](pics/dashboard_reduction_table.png){fig-width=14}
 
 *Figure: Detailed comparison table showing route-level CO2 savings, modal alternatives and reduction percentages.*
 
@@ -207,7 +207,7 @@ The detailed table supported deeper analytical inspection and enabled validation
 
 ### Route Deep-Dive and Export
 
-![](docs/pics/dashboard_deepdive.png){fig-width=14}
+![](pics/dashboard_deepdive.png){fig-width=14}
 
 *Figure: Detailed route-level inspection and export functionality supporting transparency and operational integration.*
 

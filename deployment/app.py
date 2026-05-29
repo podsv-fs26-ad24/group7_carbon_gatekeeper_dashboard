@@ -40,6 +40,7 @@ Run
     streamlit run app.py
 """
 
+# 1. imports
 from io import BytesIO
 
 import numpy as np
@@ -47,9 +48,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-# ---------------------------------------------------------------------------
-# Page configuration
-# ---------------------------------------------------------------------------
+# 2. page configuration
 st.set_page_config(
     page_title="Business Travel CO2 Dashboard",
     page_icon=None,
@@ -57,9 +56,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ---------------------------------------------------------------------------
-# Design system (lecture guideline #7 + #20: consistency, color discipline)
-# ---------------------------------------------------------------------------
+# 3. design system
+# define dashboard colors
 COLOR = {
     "ink":     "#1F2937",
     "muted":   "#6B7280",
@@ -70,6 +68,7 @@ COLOR = {
     "bad":     "#EF4444",
 }
 
+# assign colors to business units
 BU_COLOR = {
     "BU1": "#2563EB",
     "BU2": "#7C3AED",
@@ -77,6 +76,7 @@ BU_COLOR = {
     "BU4": "#DB2777",
 }
 
+# assign colors to travel modes
 MODE_COLOR = {
     "flight":     "#EF4444",
     "train":      "#10B981",
@@ -84,6 +84,7 @@ MODE_COLOR = {
     "rental_car": "#F59E0B",
 }
 
+# 4. inject global CSS styling
 CUSTOM_CSS = """
 <style>
   html, body, [class*="css"]  { font-family: 'Inter', 'Arial', sans-serif; color: #1F2937; }
@@ -128,7 +129,7 @@ CUSTOM_CSS = """
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
-# Plotly default look. NOTE: margin is set per-figure to avoid duplicate kwargs.
+# 5. shared plotly layout defaults
 PLOTLY_BASE = dict(
     font=dict(family="Inter, Arial, sans-serif", size=12, color=COLOR["ink"]),
     paper_bgcolor="white",
@@ -137,14 +138,12 @@ PLOTLY_BASE = dict(
 
 
 def plotly_layout(**overrides):
-    """Merge base style with per-figure overrides without duplicating keys."""
+    """Merge base Plotly style with per-figure overrides without duplicating keys."""
     layout = dict(PLOTLY_BASE)
     layout.update(overrides)
     return layout
 
-# ---------------------------------------------------------------------------
-# Data layer
-# ---------------------------------------------------------------------------
+# 6. required column definitions
 REQUIRED_HIST = [
     "transport_mode", "departure_iata", "arrival_iata",
     "departure_lat", "departure_lon", "arrival_lat", "arrival_lon",
@@ -154,14 +153,14 @@ REQUIRED_INPUT = [
     "transport_mode", "departure_iata", "arrival_iata", "business_unit",
 ]
 
-
+# 7. load excel workbook into memory
 @st.cache_data(show_spinner=False)
 def load_workbook(file_bytes: bytes) -> dict:
     buf = BytesIO(file_bytes)
     buf.seek(0)
     return pd.read_excel(buf, sheet_name=None)
 
-
+# 8. parse BU budgets from budget sheet
 def parse_budgets(df: pd.DataFrame) -> dict:
     if df is None or df.empty:
         return {}
@@ -172,7 +171,7 @@ def parse_budgets(df: pd.DataFrame) -> dict:
     df = df.assign(b=pd.to_numeric(s, errors="coerce"))
     return {bu: v for bu, v in zip(df["Business Unit"], df["b"]) if isinstance(bu, str) and bu.startswith("BU")}
 
-
+# 9. compute per-route averages from historical data
 def route_averages(df: pd.DataFrame, co2_col: str) -> pd.DataFrame:
     return (
         df.groupby(["departure_iata", "arrival_iata", "transport_mode"], dropna=False)
@@ -189,7 +188,7 @@ def route_averages(df: pd.DataFrame, co2_col: str) -> pd.DataFrame:
         .reset_index()
     )
 
-
+# 10. enrich planned trips with CO2 estimates and coordinates
 def enrich_input(input_df: pd.DataFrame, route_avg: pd.DataFrame, co2_col: str) -> pd.DataFrame:
     """Look up CO2 average and coordinates for each input trip."""
     merged = input_df.merge(
@@ -218,7 +217,7 @@ def enrich_input(input_df: pd.DataFrame, route_avg: pd.DataFrame, co2_col: str) 
         merged["km"] = merged["avg_km"]
     return merged.drop(columns=["dep_lat", "dep_lon", "arr_lat", "arr_lon"], errors="ignore")
 
-
+# 11. find greener alternatives for each flight
 def find_alternatives(estimated: pd.DataFrame, route_avg: pd.DataFrame) -> pd.DataFrame:
     flights = estimated[estimated["transport_mode"] == "flight"].copy()
     # Preserve the original index so apply_alternatives can write back correctly.
@@ -240,7 +239,7 @@ def find_alternatives(estimated: pd.DataFrame, route_avg: pd.DataFrame) -> pd.Da
     best.index.name = None
     return best.sort_values("saving_t", ascending=False)
 
-
+# 12. apply mode shifts to produce optimised scenario
 def apply_alternatives(estimated: pd.DataFrame, alts: pd.DataFrame) -> pd.DataFrame:
     """Replace flights with their greener alternative where one exists.
 
@@ -260,11 +259,9 @@ def apply_alternatives(estimated: pd.DataFrame, alts: pd.DataFrame) -> pd.DataFr
     return out
 
 
-# ---------------------------------------------------------------------------
-# Route comparison helpers (used in Section 3b)
-# ---------------------------------------------------------------------------
+# Route comparison helpers 
 
-# Common city → IATA mapping
+# 13. city-to-IATA lookup table
 CITY_TO_IATA = {
     "zurich": "ZRH", "zuerich": "ZRH", "zürich": "ZRH",
     "geneva": "GVA", "genf": "GVA",
@@ -340,7 +337,7 @@ CITY_TO_IATA = {
     "las vegas": "LAS",
 }
 
-# Airport coordinates for great-circle distance fallback
+# 14. airport coordinates for distance-based fallback
 AIRPORT_COORDS = {
     "ZRH": (47.4647, 8.5492), "GVA": (46.2370, 6.1089), "BSL": (47.5896, 7.5299),
     "BRN": (46.9141, 7.4990), "LHR": (51.4775, -0.4614), "LGW": (51.1537, -0.1821),
@@ -370,17 +367,17 @@ AIRPORT_COORDS = {
     "PHX": (33.4373, -112.0078), "LAS": (36.0840, -115.1537),
 }
 
-# Emission factors: kg CO2 per passenger-km (used only when route not in historical data)
+# 15. emission factors per mode (kg CO2 per passenger-km)
 EF_KG_PER_KM = {
     "flight":     0.255,   # short/medium haul average incl. RFI
     "train":      0.041,
     "rental_car": 0.171,
     "bus":        0.089,
 }
-# Max realistic distance (km) for ground transport to be shown as an option
+# max distance for ground transport alternatives
 GROUND_MAX_KM = 1500
 
-
+# 16. resolve city name or code to IATA
 def resolve_iata(text: str) -> str | None:
     """Convert a city name or IATA code string to an IATA code, or None if unknown."""
     t = text.strip()
@@ -388,7 +385,7 @@ def resolve_iata(text: str) -> str | None:
         return t.upper()
     return CITY_TO_IATA.get(t.lower().strip())
 
-
+# 17. haversine great-circle distance
 def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     R = 6371.0
     phi1, phi2 = np.radians(lat1), np.radians(lat2)
@@ -397,7 +394,7 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     a = np.sin(dphi / 2) ** 2 + np.cos(phi1) * np.cos(phi2) * np.sin(dlam / 2) ** 2
     return R * 2 * np.arcsin(np.sqrt(a))
 
-
+# 18. compare CO2 across modes for a given route
 def compare_route(dep: str, arr: str, ravg_df: pd.DataFrame) -> pd.DataFrame:
     """Return CO2 per mode for the given route.
 
@@ -456,9 +453,11 @@ def compare_route(dep: str, arr: str, ravg_df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-# ---------------------------------------------------------------------------
 # Visual components
-# ---------------------------------------------------------------------------
+
+
+
+# 19. gauge chart for BU budget compliance
 def gauge(value: float, budget: float, title: str, color: str) -> go.Figure:
     if budget is None or pd.isna(budget) or budget <= 0:
         budget = max(value, 1.0)
@@ -524,7 +523,7 @@ def gauge(value: float, budget: float, title: str, color: str) -> go.Figure:
     ))
     return fig
 
-
+# 20. stacked horizontal bar chart: actual vs saving potential per BU
 def bar_bu_vs_budget(
     emissions: dict,
     budgets: dict,
@@ -563,7 +562,7 @@ def bar_bu_vs_budget(
 
     fig = go.Figure()
 
-    # ── Segment 1: optimised (remaining) CO2 ─────────────────────────────────
+    # ── Segment 1: optimised (remaining) CO2 
     hover_base = []
     for b, opt, act in zip(bus, opt_vals, actual):
         saving = act - opt
@@ -585,7 +584,7 @@ def bar_bu_vs_budget(
         customdata=hover_base,
     )
 
-    # ── Segment 2: saving potential (stacked on top) ──────────────────────────
+    # ── Segment 2: saving potential (stacked on top) 
     hover_save = []
     for b, s, act in zip(bus, savings, actual):
         pct = (s / act * 100) if act > 0 else 0
@@ -609,7 +608,7 @@ def bar_bu_vs_budget(
         customdata=hover_save,
     )
 
-    # ── Budget markers ────────────────────────────────────────────────────────
+    # ── Budget markers
     for i, (bu, bud) in enumerate(zip(bus, budget)):
         if not pd.isna(bud):
             fig.add_shape(
@@ -649,7 +648,7 @@ def bar_bu_vs_budget(
     ))
     return fig
 
-
+# 21. region view presets for the world map
 REGION_VIEWS = {
     "World":     {"projection": "natural earth", "scope": "world",  "center": None,                      "lonaxis": None,            "lataxis": None},
     "Europe":    {"projection": "mercator",      "scope": "europe", "center": {"lon": 10, "lat": 50},     "lonaxis": [-25, 45],       "lataxis": [35, 70]},
@@ -657,7 +656,7 @@ REGION_VIEWS = {
     "Asia":      {"projection": "mercator",      "scope": "world",  "center": {"lon": 100, "lat": 30},    "lonaxis": [40, 150],       "lataxis": [-10, 60]},
 }
 
-
+# 22. world map with route lines scaled by CO2
 def world_map(routes: pd.DataFrame, region: str = "World") -> go.Figure:
     fig = go.Figure()
     base_layout_kwargs = dict(
@@ -752,7 +751,7 @@ def world_map(routes: pd.DataFrame, region: str = "World") -> go.Figure:
     fig.update_layout(**plotly_layout(geo=geo_cfg, **base_layout_kwargs))
     return fig
 
-
+# 23. horizontal bar chart comparing CO2 per mode for a route
 def route_comparison_chart(comp_df: pd.DataFrame) -> go.Figure:
     """Horizontal bar chart comparing CO2 per mode, with flight as reference line."""
     modes = comp_df["mode"].str.replace("_", " ").str.title().tolist()
@@ -804,9 +803,10 @@ def route_comparison_chart(comp_df: pd.DataFrame) -> go.Figure:
     return fig
 
 
-# ---------------------------------------------------------------------------
-# Sidebar (lecture guideline #9: manage complexity, keep filters separate)
-# ---------------------------------------------------------------------------
+# Sidebar (manage complexity, keep filters separate)
+
+
+# 24. sidebar file uploaders and method selector
 st.sidebar.markdown("### Data sources")
 hist_file = st.sidebar.file_uploader(
     "1. Historical reference (Excel)",
@@ -826,9 +826,10 @@ co2_metric = st.sidebar.radio(
     help="RFI = Radiative Forcing Index. RFI 2.7 reflects high-altitude flight effects more strongly.",
 )
 
-# ---------------------------------------------------------------------------
 # Main canvas
-# ---------------------------------------------------------------------------
+
+
+# 25. dashboard title and subtitle
 st.markdown("# Business Travel CO2 Dashboard")
 st.markdown(
     "<div class='subtitle'>"
@@ -840,15 +841,14 @@ st.markdown(
 
 
 if hist_file is None:
+    # 26. landing state: prompt user to upload files
     st.info(
         "Please upload the **historical reference Excel** in the sidebar to begin. "
         "Optionally, also upload a **planned trips file** to analyse upcoming travel; "
         "without it the dashboard analyses the historical data itself."
     )
 else:
-    # ------------------------------------------------------------------
-    # Load historical workbook
-    # ------------------------------------------------------------------
+    # 27. load and validate historical workbook
     hist_book = load_workbook(hist_file.getvalue())
     if "travel_data" not in hist_book:
         st.error("Sheet 'travel_data' not found in the historical file.")
@@ -864,9 +864,7 @@ else:
             budgets = parse_budgets(hist_book.get("budget_2026"))
             ravg = route_averages(hist, co2_metric)
 
-            # ------------------------------------------------------------------
-            # Decide source: planned trips file or fall back to historical
-            # ------------------------------------------------------------------
+            # 28. load planned trips or fall back to historical data
             _inp_error = None
             if input_file is not None:
                 inp_book = load_workbook(input_file.getvalue())
@@ -893,9 +891,7 @@ else:
             else:
                 estimated_original = enrich_input(inp, ravg, co2_metric)
 
-                # ------------------------------------------------------------------
-                # Scenario state
-                # ------------------------------------------------------------------
+                # 29. initialise scenario state and compute alternatives
                 if "scenario" not in st.session_state:
                     st.session_state.scenario = "as_planned"
 
@@ -909,7 +905,7 @@ else:
                     estimated = estimated_original
                     alts = alts_original
 
-                # Period info
+                # 30. derive date range for metadata strip
                 if "date" in estimated.columns and estimated["date"].notna().any():
                     d_min = estimated["date"].min()
                     d_max = estimated["date"].max()
@@ -917,7 +913,7 @@ else:
                 else:
                     period = "unspecified"
 
-                # Scenario indicator strip
+                # 31. optimised scenario banner and reset button
                 if st.session_state.scenario == "optimised":
                     n_shifted = int(estimated["mode_shifted"].sum()) if "mode_shifted" in estimated.columns else 0
                     sc_col1, sc_col2 = st.columns([4, 1])
@@ -934,7 +930,7 @@ else:
                             st.session_state.scenario = "as_planned"
                             st.rerun()
 
-                # Metadata strip
+                # 32. metadata strip: source, period, trips, scenario, method
                 n_unmatched = int(estimated["estimated_co2"].isna().sum())
                 match_note = "" if n_unmatched == 0 else f" - {n_unmatched} trip(s) without route match"
                 scenario_label = "as planned" if st.session_state.scenario == "as_planned" else "optimised (mode shift applied)"
@@ -950,9 +946,9 @@ else:
                     unsafe_allow_html=True,
                 )
 
-                # ------------------------------------------------------------------
                 # Section 1: Overview KPIs
-                # ------------------------------------------------------------------
+
+                # 33. compute top-level totals
                 total_co2 = float(estimated["estimated_co2"].sum())
                 total_budget = sum(budgets.values()) if budgets else 0
                 n_trips = len(estimated)
@@ -961,6 +957,7 @@ else:
 
                 kc = st.columns(4)
 
+                # 34. KPI card: total CO2 vs budget
                 with kc[0]:
                     if total_budget > 0:
                         delta_t = total_co2 - total_budget
@@ -980,6 +977,7 @@ else:
                         unsafe_allow_html=True,
                     )
 
+                # 35. KPI card: budget utilisation %
                 with kc[1]:
                     compliance = (total_co2 / total_budget * 100) if total_budget > 0 else 0
                     if compliance > 100:
@@ -997,6 +995,7 @@ else:
                         unsafe_allow_html=True,
                     )
 
+                # 36. KPI card: reduction potential or savings achieved
                 with kc[2]:
                     if st.session_state.scenario == "optimised":
                         pct_save = (saving_potential / (total_co2 + saving_potential) * 100) if (total_co2 + saving_potential) > 0 else 0
@@ -1020,6 +1019,7 @@ else:
                             unsafe_allow_html=True,
                         )
 
+                # 37. KPI card: trip count and average kg per trip
                 with kc[3]:
                     avg_per_trip = (total_co2 / n_trips * 1000) if n_trips else 0
                     st.markdown(
@@ -1031,7 +1031,7 @@ else:
                         unsafe_allow_html=True,
                     )
 
-                # Headline
+                # 38. contextual headline banner: over / approaching / within budget
                 if total_budget > 0:
                     if total_co2 > total_budget:
                         st.markdown(
@@ -1059,9 +1059,7 @@ else:
                             unsafe_allow_html=True,
                         )
 
-                # ------------------------------------------------------------------
                 # Section 2: BU performance
-                # ------------------------------------------------------------------
                 st.markdown("<div class='section-title'>Budget compliance by Business Unit</div>", unsafe_allow_html=True)
                 st.markdown(
                     "<div class='section-hint'>Status gauges and ranking, side by side. "
@@ -1070,6 +1068,7 @@ else:
                     unsafe_allow_html=True,
                 )
 
+                # 39. compute per-BU emissions and optimised totals
                 bu_emissions = estimated.groupby("business_unit")["estimated_co2"].sum().to_dict()
                 bus_present  = sorted(set(bu_emissions.keys()) | set(budgets.keys()))
 
@@ -1080,6 +1079,7 @@ else:
 
                 left, right = st.columns([3, 2])
 
+                # 40. gauge grid: one gauge per BU, two per row
                 with left:
                     if bus_present:
                         rows = [bus_present[i:i+2] for i in range(0, len(bus_present), 2)]
@@ -1096,15 +1096,15 @@ else:
                                     config={"displayModeBar": False},
                                 )
 
+                # 41. stacked bar chart: actual + saving potential, budget line
                 with right:
-                    # Always pass bu_optimised so the saving potential is permanently visible
                     st.plotly_chart(
                         bar_bu_vs_budget(bu_emissions, budgets, bu_optimised),
                         use_container_width=True,
                         config={"displayModeBar": False},
                     )
 
-                # Per-BU headlines
+                # 42. per-BU status headlines
                 hl_cols = st.columns(len(bus_present)) if bus_present else []
                 for col, bu in zip(hl_cols, bus_present):
                     actual = bu_emissions.get(bu, 0)
@@ -1134,9 +1134,7 @@ else:
                             unsafe_allow_html=True,
                         )
 
-                # ------------------------------------------------------------------
                 # Section 3: Geography
-                # ------------------------------------------------------------------
                 st.markdown("<div class='section-title'>Geographic distribution</div>", unsafe_allow_html=True)
                 st.markdown(
                     "<div class='section-hint'>Line thickness scales with total CO2 on each route. "
@@ -1144,6 +1142,7 @@ else:
                     unsafe_allow_html=True,
                 )
 
+                # 43. region selector for map zoom
                 map_left, _ = st.columns([1, 4])
                 with map_left:
                     map_region = st.selectbox(
@@ -1151,6 +1150,7 @@ else:
                         label_visibility="collapsed", key="map_region",
                     )
 
+                # 44. aggregate trips to route level and render world map
                 route_summary = (
                     estimated.groupby(["departure_iata", "arrival_iata", "transport_mode"])
                     .agg(
@@ -1168,7 +1168,7 @@ else:
                     use_container_width=True, config={"displayModeBar": False},
                 )
 
-                # Build airport lookup (used in Section 4 route analysis)
+                # 45. build airport coordinate lookup from historical data
                 _ap_dep = (
                     hist[["departure_iata", "departure_lat", "departure_lon"]]
                     .dropna()
@@ -1196,6 +1196,7 @@ else:
                         return r2[0], r2[1]
                     return None, None
 
+                # 46. estimate door-to-door travel duration per mode
                 def estimate_duration(mode: str, km: float) -> str:
                     if km is None:
                         return "n/a"
@@ -1206,9 +1207,7 @@ else:
                     m = int((total_h - h) * 60)
                     return f"{h}h {m:02d}m"
 
-                # ------------------------------------------------------------------
                 # Section 4: Reduction levers
-                # ------------------------------------------------------------------
                 st.markdown("<div class='section-title'>Reduction levers</div>", unsafe_allow_html=True)
                 st.markdown(
                     "<div class='section-hint'>For every flight in the input, the dashboard checks if a "
@@ -1224,6 +1223,7 @@ else:
                         unsafe_allow_html=True,
                     )
                 else:
+                    # 47. aggregate alternatives to route-level summary table
                     summary = (
                         alts.groupby(["departure_iata", "arrival_iata", "alt_mode"])
                         .agg(
@@ -1249,6 +1249,7 @@ else:
 
                     sav_col1, sav_col2 = st.columns([1, 2])
                     with sav_col1:
+                        # 48. saving potential KPI card
                         _ok = COLOR["ok"]
                         st.markdown(
                             f"<div class='kpi-card'>"
@@ -1259,7 +1260,7 @@ else:
                             unsafe_allow_html=True,
                         )
                     with sav_col2:
-                        # Clickable table — selecting a row auto-fills the deep-dive below
+                        # 49. interactive alternatives table: row click fills deep-dive
                         tbl_selection = st.dataframe(
                             summary.head(15).style.format({
                                 "Avg flight (t)": "{:.3f}",
@@ -1273,7 +1274,7 @@ else:
                         )
                         st.caption("👆 Click a row to load that route in the deep-dive below.")
 
-                    # Sync table click → deep-dive selectors (runs before widgets render)
+                    # 50. sync table selection to session state for deep-dive
                     _sel_rows = tbl_selection.selection.get("rows", []) if tbl_selection else []
                     if _sel_rows:
                         _sel_row = summary.head(15).iloc[_sel_rows[0]]
@@ -1282,6 +1283,7 @@ else:
 
                     btn_col1, btn_col2 = st.columns([1, 3])
                     with btn_col1:
+                        # 51. apply all alternatives button: switches to optimised scenario
                         if st.button(
                             "Apply alternatives",
                             type="primary", use_container_width=True, key="apply_alts",
@@ -1300,6 +1302,8 @@ else:
                         )
 
                     # ── Route deep-dive analysis ──────────────────────────────
+
+                    # 52. route deep-dive header
                     st.markdown(
                         "<div class='section-hint' style='margin-top:1.2rem;margin-bottom:0.5rem'>"
                         "<b>Route deep-dive</b> &nbsp;·&nbsp; "
@@ -1333,6 +1337,7 @@ else:
                             _col_bad = COLOR["bad"]
                             _col_mut = COLOR["muted"]
 
+                            # 53. route metadata: distance and data source note
                             st.markdown(
                                 f"<div class='section-hint' style='margin-top:0'>"
                                 f"<b>{dd_dep} → {dd_arr}</b> &nbsp;·&nbsp; ≈ {dd_km:,.0f} km"
@@ -1341,10 +1346,12 @@ else:
                                 unsafe_allow_html=True,
                             )
 
-                            # Map + chart side by side
+                            # 54. three-column layout: mini map | bar chart | mode cards
                             map_col, chart_col, card_col = st.columns([2, 3, 2])
 
                             # ── Mini map ───────────────────────────────────────
+
+                            # 55. mini map: one arc per mode, offset to avoid overlap
                             with map_col:
                                 if dd_coords_ok:
                                     _pad_lat = max(6, abs(dd_dep_lat - dd_arr_lat) * 0.4)
@@ -1419,6 +1426,8 @@ else:
                                     )
 
                             # ── Bar + duration chart ───────────────────────────
+
+                            # 56. dual-axis chart: CO2 bars + duration scatter
                             with chart_col:
                                 rows_disp = []
                                 for _, mrow in dd_comp.iterrows():
@@ -1479,6 +1488,8 @@ else:
                                 st.plotly_chart(fig_bar, use_container_width=True, config={"displayModeBar": False})
 
                             # ── Mode cards ────────────────────────────────────
+
+                            # 57. mode summary cards with CO2, duration, saving tag
                             with card_col:
                                 for _, r in cmp_disp.iterrows():
                                     mode_lbl = r["mode"].replace("_", " ").title()
@@ -1506,10 +1517,9 @@ else:
                                         unsafe_allow_html=True,
                                     )
 
-                # ------------------------------------------------------------------
                 # Section 5: Detail + Travel Plan Export (collapsed)
-                # ------------------------------------------------------------------
                 with st.expander("Detail data and export"):
+                    # 58. raw trip-level detail table (capped at 2000 rows)
                     detail_cols = [
                         c for c in [
                             "date", "business_unit", "person_type", "transport_mode",
@@ -1524,7 +1534,8 @@ else:
                     st.caption(f"Showing first 2000 of {len(estimated):,} rows.")
 
                     # ── Build Travel Plan export ──────────────────────────────
-                    # Merge estimated trips with their suggested alternative (if any)
+
+                    # 59. join alternatives onto trip list and set action column
                     travel_plan = estimated.copy()
                     if not alts_original.empty:
                         alt_cols = ["alt_mode", "alt_co2", "saving_t", "saving_pct"]
@@ -1558,7 +1569,7 @@ else:
                     ] if c in travel_plan.columns]
                     travel_plan_out = travel_plan[export_cols].copy()
 
-                    # BU summary for the summary sheet
+                    # 60. build BU summary sheet
                     bu_summary = (
                         travel_plan_out.groupby("business_unit")
                         .agg(
@@ -1579,6 +1590,7 @@ else:
                     # Add budget column
                     bu_summary["budget_t"] = bu_summary["Business Unit"].map(budgets)
 
+                    # 61. write multi-sheet Excel to in-memory buffer and offer download
                     buf = BytesIO()
                     with pd.ExcelWriter(buf, engine="openpyxl") as w:
                         # Sheet 1: Executive summary by BU

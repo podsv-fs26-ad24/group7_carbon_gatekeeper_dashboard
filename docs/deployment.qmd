@@ -1,25 +1,25 @@
 # Deployment
 
-This report documents the deployment of the **Carbon Gatekeeper Dashboard** prototype. It covers the technical setup, environment configuration, and instructions for running and maintaining the application locally. Together, these sections cover the *Deployment* phase of the project.
+This report documents the deployment of the **Carbon Gatekeeper Dashboard** prototype. It covers the technical setup, environment configuration, and instructions for running and maintaining the application. Together, these sections cover the *Deployment* phase of the project.
 
-The dashboard is deployed as a **local prototype**, running on the user's machine via a browser-based interface. No external hosting or cloud infrastructure is required.
+The dashboard is deployed as a **web-based prototype** accessible via Streamlit Community Cloud, as well as locally on the user's machine for development and testing purposes.
 
 ---
 
 ## Deployment Overview
 
-The Carbon Gatekeeper Dashboard is implemented as a **Streamlit web application** (`app.py`) and is run locally. The application is served via a local development server and accessed through the browser at `http://localhost:8501`.
+The Carbon Gatekeeper Dashboard is implemented as a **Streamlit web application** (`app.py`) and is deployed via **Streamlit Community Cloud**. The application is publicly accessible via a browser without any local setup required.
 
 | Property | Value |
 |:---|:---|
 | **Framework** | Streamlit |
-| **Deployment Type** | Local prototype |
+| **Deployment Type** | Streamlit Community Cloud |
 | **Repository** | GitHub (`podsv-fs26-ad24/ad24-7-fancyproject`) |
 | **Branch** | `main` |
 | **Entry Point** | `app.py` |
-| **Access** | `http://localhost:8501` (local only) |
+| **Access** | [https://ad24-7-carbon-dahsboard-npbjyrg3edv8hzoxyzxmwl.streamlit.app/](https://ad24-7-carbon-dahsboard-npbjyrg3edv8hzoxyzxmwl.streamlit.app/) |
 
-> **Note:** The dashboard is only accessible while the Streamlit server is actively running in the terminal. It is not publicly hosted and cannot be accessed by other users without running the application locally on their own machine.
+> **Access the live dashboard:** [Carbon Gatekeeper Dashboard](https://ad24-7-carbon-dahsboard-npbjyrg3edv8hzoxyzxmwl.streamlit.app/)
 
 ---
 
@@ -144,11 +144,11 @@ Use the **export functionality** in the Route Deep-Dive section to download deta
 
 ## Accessibility
 
-The dashboard runs locally and is only accessible on the machine where the application is started.
+The dashboard is publicly accessible via Streamlit Community Cloud and does not require login credentials or any local software installation.
 
 | Property | Detail |
 |:---|:---|
-| **Access model** | Local only (`http://localhost:8501`) |
+| **Access model** | Public URL, no authentication required |
 | **Device support** | Desktop browsers (Chrome, Firefox, Edge, Safari) |
 | **Data privacy** | Uploaded files are processed in-memory and are not persistently stored by the application |
 
@@ -174,9 +174,8 @@ The following limitations apply to the current local prototype deployment:
 
 | Limitation | Impact | Mitigation |
 |:---|:---|:---|
-| Local access only | Dashboard is not accessible to other users without running it themselves | Acceptable for prototype scope; cloud hosting could be added in future |
 | Manual data upload | Users must upload data files on each session start | Automated data pipelines could be integrated in future iterations |
-| No authentication | No login or access control | Not required for local prototype use |
+| No authentication | All users with the link can access the dashboard | Acceptable for prototype scope; role-based access recommended for production |
 | In-memory processing | Large datasets may cause slower response times | Performance testing recommended for datasets exceeding 50,000 rows |
 
 ---
@@ -185,7 +184,6 @@ The following limitations apply to the current local prototype deployment:
 
 The following improvements are recommended for a potential future production deployment, as identified during the evaluation phase:
 
-- **Cloud hosting** — Deploy the application to a platform such as Streamlit Community Cloud to enable broader stakeholder access without requiring local setup.
 - **Authentication and access control** — Implement role-based access to restrict sensitive travel and emissions data to authorised users only.
 - **Automated data refresh** — Integrate automated pipelines to periodically pull updated travel data from the corporate travel management system, replacing manual file uploads.
 - **Performance optimisation** — Evaluate caching strategies and data processing optimisations for larger datasets.

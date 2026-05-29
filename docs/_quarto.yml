@@ -19,7 +19,6 @@ website:
       - viz_design_report.qmd
       - evaluation.qmd
       - deployment.qmd
-      - meeting_notes.qmd
 
 format:
   html:

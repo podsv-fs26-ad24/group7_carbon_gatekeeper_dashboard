@@ -47,7 +47,7 @@ The dashboard requires the following data files to operate correctly:
 | File | Role | Upload Method |
 |:---|:---|:---|
 | `traveldata-export_clean.xlsx` | Historical reference data (route baselines, CO₂ budgets) | Sidebar file uploader |
-| `input_data.xlsx` | Planned trips for analysis | Sidebar file uploader (optional) |
+| `input_data.xlsx` | Planned trips for analysis | Sidebar file uploader |
 
 Both files are uploaded interactively through the dashboard's sidebar at runtime. No static data files are bundled with the application itself.
 
@@ -57,14 +57,14 @@ Both files are uploaded interactively through the dashboard's sidebar at runtime
 
 To run the dashboard locally, follow these steps.
 
-### 1. Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/podsv-fs26-ad24/ad24-7-fancyproject.git
 cd ad24-7-fancyproject
 ```
 
-### 2. Set Up the Python Environment
+### Set Up the Python Environment
 
 Create and activate the project environment using `uv`:
 
@@ -74,7 +74,7 @@ uv sync
 
 This installs all required dependencies as defined in `pyproject.toml` and `uv.lock`.
 
-### 3. Configure Environment Variables
+### Configure Environment Variables
 
 Copy the provided template and rename it to `.env`:
 
@@ -84,10 +84,10 @@ cp .env.template .env
 
 Edit the `.env` file if required to configure any environment-specific variables.
 
-### 4. Run the Application
+### Run the Application
 
 ```bash
-uv run streamlit run app.py
+streamlit run app.py
 ```
 
 The dashboard will open automatically in your default browser, or can be accessed manually at `http://localhost:8501`.
@@ -100,7 +100,7 @@ The dashboard will open automatically in your default browser, or can be accesse
 
 Once the application is running, the dashboard guides users through a structured analytical workflow:
 
-### Step 1: Upload Historical Reference Data
+### Upload Historical Reference Data
 
 In the **sidebar**, upload the historical reference file (`traveldata-export_clean.xlsx`). This file provides:
 
@@ -109,15 +109,15 @@ In the **sidebar**, upload the historical reference file (`traveldata-export_cle
 
 The dashboard cannot operate without this file.
 
-### Step 2: Upload Planned Trips (Optional)
+### Upload Planned Trips
 
-Optionally upload a planned trips file (`input_data.xlsx`) in the sidebar. This allows the dashboard to:
+Upload a planned trips file (`input_data.xlsx`) in the sidebar. This allows the dashboard to:
 
 - Compare planned trips against historical route averages
 - Identify routes with viable lower-carbon alternatives
 - Calculate the total reduction potential for the uploaded travel plan
 
-### Step 3: Explore the Dashboard
+### Explore the Dashboard
 
 The dashboard is organised into four sections, following the narrative flow **Overview → Insights → Action**:
 
@@ -128,7 +128,7 @@ The dashboard is organised into four sections, following the narrative flow **Ov
 | **Geographic Distribution** | Connection map showing travel routes and transport mode distribution globally |
 | **Reduction Levers** | Ranked list of routes with the highest CO₂ saving potential, including modal alternatives and estimated savings |
 
-### Step 4: Apply the Optimised Scenario
+### Apply the Optimised Scenario
 
 Click the **"Apply alternatives"** button to activate the scenario optimisation mode. The dashboard will:
 
@@ -136,7 +136,7 @@ Click the **"Apply alternatives"** button to activate the scenario optimisation 
 - Recalculate all KPI cards, gauges, and charts to reflect the projected savings
 - Display the updated budget compliance across all Business Units
 
-### Step 5: Export Data
+### Export Data
 
 Use the **export functionality** in the Route Deep-Dive section to download detailed route-level data for reporting, stakeholder communication, or further external analysis.
 
@@ -192,31 +192,6 @@ The following improvements are recommended for a potential future production dep
 - **Responsive layout** — Improve the dashboard layout for smaller screen sizes and mobile devices.
 - **Integration with travel management systems** — Connect the dashboard directly to existing booking and reporting systems for seamless operational integration.
 - **Contextual explanations** — Add additional inline explanations and tooltips to improve interpretability for first-time users, as identified during the evaluation.
-
----
-
-## Repository Structure
-
-The following project structure is relevant for deployment and maintenance:
-
-```
-ad24-7-fancyproject/
-├── app.py                  # Main Streamlit application
-├── pyproject.toml          # Project dependencies and metadata
-├── uv.lock                 # Locked dependency versions
-├── .env.template           # Environment variable template
-├── .python-version         # Python version specification
-├── docs/                   # Quarto documentation project
-│   ├── _quarto.yml
-│   ├── project_charta.qmd
-│   ├── data_report.qmd
-│   ├── viz_design_report.qmd
-│   ├── evaluation.qmd
-│   └── deployment.qmd      # This document
-└── .github/
-    └── workflows/
-        └── publish.yml     # GitHub Actions workflow for documentation deployment
-```
 
 ---
 

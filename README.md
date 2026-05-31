@@ -1,139 +1,153 @@
-# Sample Project
-This is a template for a data visualization project using Python, uv for environment and package management and Quarto for documentation.
+# Carbon Gatekeeper Dashboard
 
-To adapt to your individual project change `sample` to the respective project name in the commands below
+An interactive, web-based decision-support tool that links planned business travel to annual CO₂ budgets. The dashboard analyses planned itineraries against historical travel records to answer three operational questions:
 
-Adapt the `LICENSE` as required.
+- What is the current CO₂ budget status and compliance across all Business Units?
+- Which planned routes have viable lower-carbon transport alternatives?
+- How much CO₂ can be saved by shifting to those alternatives?
 
-> To do: Provide a brief description of the project here.
+A central **"Apply alternatives"** toggle recomputes the entire dashboard — KPIs, Business Unit gauges, bar charts, geographic map, and reduction-levers table — to quantify projected savings, turning emissions data into actionable, point-of-planning guidance.
+
+---
 
 ## Project Organisation
-The visualization product development is organised according to the following process model:
 
-![The visualization product development process](docs/pics/vizproductprocess.png)
+The project follows a structured visualization product development process across four phases:
 
-Code and configurations used in the different project phases are stored in the correspoding subfolders. Documentation artefacts in the form of a Quarto project are provided in `docs`.
+| Phase | Code / Data | Documentation |
+|:------|:------------|:--------------|
+| Project Understanding | — | `docs/project_charta.qmd` |
+| Data Acquisition & Exploration | `data_acquisition/`, `eda/` | `docs/data_report.qmd` |
+| Visual Encoding & Design | `app.py`, `encoding-design/` | `docs/viz_design_report.qmd` |
+| Evaluation | `evaluation/` | `docs/evaluation.qmd` |
+| Deployment | `deployment/` | `docs/deployment.qmd` |
 
-| Phase | Code folders | Documentation section | `docs`-File |
-|:-------|:---|:---|:---|
-| Project Understanding | -  | Project Charta | project_charta.qmd  |
-| Data Acquisition and Exploration | `eda` | Data Report | data_report.qmd  |
-| Visual Encoding and Design | `encoding-design`  | Visual Encoding and Design | viz_encoding_design.qmd  |
-| Evaluation | `evaluation`  | Evaluation | evaluation.qmd  |
-| Deployment | `deployment` | Deployment | deplyoment.qmd |
+Full project documentation is available as a Quarto website in the `docs/` folder (see [Documentation](#documentation) below).
 
+---
 
-> To do: Adjust accoding to your specific project needs - ensure consistency with readme, documentation, etc.
+## Tech Stack
 
-> To do: add link to documentation website for convenience.
+- **[Streamlit](https://streamlit.io/)** — interactive web application framework
+- **[Plotly](https://plotly.com/python/)** — interactive charts and geographic maps
+- **[Pandas](https://pandas.pydata.org/)** — data manipulation and processing
+- **[uv](https://docs.astral.sh/uv/)** — Python environment and package management
+- **[Quarto](https://quarto.org/)** — project documentation
 
+---
 
-See section `Quarto Setup and Usage` for instructions on how to build and serve the documentation website using Quarto.
+## Getting Started
 
-## Python Environment Setup and Management with uv
-Make sure to have uv installed: https://docs.astral.sh/uv/getting-started/installation/
+### Prerequisites
 
-After cloning the repository,  create the python environment with all dependencies based on the `.python-version`, `pyproject.toml` and `uv.lock` files by running
+Make sure [uv](https://docs.astral.sh/uv/getting-started/installation/) is installed.
+
+### Setup
+
+Clone the repository and create the Python environment:
+
 ```bash
+git clone https://github.com/podsv-fs26-ad24/ad24-7-fancyproject.git
+cd ad24-7-fancyproject
 uv sync
 ```
 
-To add new dependencies, use
+### Environment Variables
+
+Copy the provided template and rename it to `.env`:
+
 ```bash
-uv add <package>
+cp .env.template .env
 ```
-which will add the package to `pyproject.toml` and update the `uv.lock` file. You can also specify a version, e.g. `uv add pandas==2.0.3`.
 
-Remove packages with
+Edit the `.env` file if needed to configure any environment-specific variables.
+
+### Run the App
+
 ```bash
-uv remove <package>
+uv run streamlit run app.py
 ```
 
-Commit changes to `pyproject.toml` and `uv.lock` files into version control.
+The dashboard will open automatically in your browser, or can be accessed at `http://localhost:8501`.
 
-Run `uv sync` after pulling changes to update the local environment.
+---
 
-Whenever the python environment is used, make sure to prefix every command that uses python with `uv run`, e.g.
+## Input Data
+
+The dashboard requires two Excel files, both located in `data_acquisition/data_clean/`. Upload them via the sidebar when the app starts.
+
+| File | Location | Role | Required |
+|:-----|:---------|:-----|:--------:|
+| `traveldata-export_clean.xlsx` | `data_acquisition/data_clean/` | Historical travel records including CO₂ baselines per route and annual CO₂ budgets per Business Unit | ✅ Yes |
+| `input_data.xlsx` (`input_data2.xlsx` – `input_data4.xlsx`) | `data_acquisition/data_clean/` | Planned trips to be analysed against the historical data | ✅ Yes |
+
+The historical reference file is required for the dashboard to function. Without it, no data can be loaded. The planned trips file enables route comparison, alternative transport recommendations, and CO₂ savings calculations.
+
+---
+
+## Usage
+
+Once the app is running:
+
+1. **Upload the historical reference file** (`traveldata-export_clean.xlsx`) in the sidebar.
+2. **Upload a planned trips file** (e.g. `input_data2.xlsx`) in the sidebar.
+3. **Explore the dashboard** — it is organised into four sections following an Overview → Insights → Action narrative:
+
+| Section | Description |
+|:--------|:------------|
+| **KPI Overview** | Total CO₂ emissions, budget utilisation, reduction potential, and number of analysed trips |
+| **BU Budget Monitor** | Gauge indicators and bar charts comparing actual emissions against CO₂ budgets per Business Unit |
+| **Geographic Distribution** | Connection map showing travel routes by transport mode, globally and by region |
+| **Reduction Levers** | Ranked list of routes with the highest CO₂ saving potential, including modal alternatives and estimated savings |
+
+4. **Click "Apply alternatives"** to activate the optimised scenario. The dashboard shifts applicable flights to lower-CO₂ alternatives and recomputes all KPIs, gauges, and charts to show projected savings.
+5. **Export data** from the Route Deep-Dive section for reporting or further analysis.
+
+---
+
+## Exploratory Data Analysis
+
+A standalone EDA notebook is available at `eda/eda_travel_data.ipynb`. It covers data structure and quality, univariate and multivariate analysis, temporal trends, geographic patterns, and CO₂ budget comparisons. Run it with:
+
 ```bash
-uv run python script.py
+uv run jupyter notebook eda/eda_travel_data.ipynb
 ```
 
-You can also run
-```bash 
-source .venv/bin/activate
-```
-to activate the project Python environment in a terminal session in order to avoid having to prefix every command.
+---
 
-## Runtime Configuration with Environment Variables
-The environment variables are specified in a .env-File, which is never commited into version control, as it may contain secrets. The repo just contains the file `.env.template` to demonstrate how environment variables are specified.
+## Documentation
 
-You have to create a local copy of `.env.template` in the project root folder and the easiest is to just rename it to `.env`.
+The full project documentation — including the Project Charta, Data Report, Visualization Design Report, Evaluation, and Deployment — is built with Quarto and located in the `docs/` folder.
 
-The content of the .env-file is then read by the pypi-dependency: `python-dotenv`. Usage:
-```python
-import os
-from dotenv import load_dotenv
-```
+To build and preview the documentation locally:
 
-`load_dotenv` reads the .env-file and sets the environment variables:
-
-```python
-load_dotenv()
-```
-
-which can then be accessed (assuming the file contains a line `SAMPLE_VAR=<some value>`):
-
-```python
-os.environ['SAMPLE_VAR']
-```
-
-## Quarto Setup and Usage
-
-### Setup Quarto
-
-1. [Install Quarto](https://quarto.org/docs/get-started/)
-2. Optional: [quarto-extension for VS Code](https://marketplace.visualstudio.com/items?itemName=quarto.quarto)
-3. If working with svg files and pdf output you will need to install rsvg-convert:
-    * On macOS: `brew install librsvg`
-    * On Windows using chocolatey:
-      * [Install chocolatey](https://chocolatey.org/install#individual)
-      * [Install rsvg-convert](https://community.chocolatey.org/packages/rsvg-convert): `choco install rsvg-convert`
-
-Source `*.qmd` and configuration files are in the `docs` folder. The Quarto project configuration is in `docs/_quarto.yml`.
-
-With embedded python code chunks that perform computations, you need to make sure that the python environment is activated when rendering. This can be done by prefixing the render command with `uv run`, e.g.:
 ```bash
+cd docs
+uv run quarto preview
+```
+
+To render the full documentation website:
+
+```bash
+cd docs
 uv run quarto render
 ```
 
-### Working on the Documentation
+The rendered site is output to `docs/build/`. Open `docs/build/index.html` in a browser to view it.
 
-1. Make changes to the `.qmd` source files in the `docs` folder
-2. Make sure the project Python environment is activated (see Python environment setup and management)
-3. Preview locally: `quarto preview` from the `docs` folder
-4. Build the documentation website: `uv run quarto render` from the `docs` folder. This renders to `docs/build`
-5. Check the website locally by opening `docs/build/index.html` in a browser
+---
 
-### Deployment of the Documentation to GitHub Pages
+## Team
 
-The documentation website is deployed to GitHub Pages via a GitHub Actions workflow (`.github/workflows/publish.yml`). Every push to `main` triggers the workflow, which renders the Quarto project and deploys the result.
+| Name | Role |
+|:-----|:-----|
+| Michelle Linares M. | Project coordination, visualization design |
+| Domenik Bächler | Data analysis and processing |
+| Dario Filippone | Dashboard development |
+| Ajna Binaki | User analysis and evaluation |
 
-The setting `execute: freeze: auto` in `_quarto.yml` ensures that Python computations are only executed locally. Results are cached in `docs/_freeze` and checked into the repository, so the GitHub Actions runner does not need Python — it uses the pre-computed results.
+---
 
-#### Initial Setup (once)
+## License
 
-1. In the GitHub repository settings, go to **Settings > Pages** and set the source to **GitHub Actions**
-2. Render locally so that `_freeze` contains cached computation results:
-   ```bash
-   cd docs && uv run quarto render
-   ```
-3. Push the changes to `main`
-
-The `_freeze` directory and the workflow file `.github/workflows/publish.yml` should already be tracked in the repository.
-
-
-#### Publishing Updates
-
-1. Build the website locally: `uv run quarto render` from the `docs` folder. This updates `docs/build` (gitignored) and `docs/_freeze` (checked in)
-2. Check the website locally by opening `docs/build/index.html`
-3. Commit and push all updated files (including `docs/_freeze`) to `main`. The GitHub Actions workflow will render and deploy the site automatically
+This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).

@@ -85,7 +85,7 @@ Edit the `.env` file if needed to configure any environment-specific variables.
 ### Run the App
 
 ```bash
-uv run streamlit run app.py
+uv run streamlit run deployment/app.py
 ```
 
 The dashboard will open automatically in your browser, or can be accessed at `http://localhost:8501`.

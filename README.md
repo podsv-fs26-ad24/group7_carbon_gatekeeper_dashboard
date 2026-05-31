@@ -159,8 +159,8 @@ The rendered site is output to `docs/build/`. Open `docs/build/index.html` in a 
 
 ## Team
 
-| Name | Role |
-|:-----|:-----|
+| Name |
+|:-----|
 | Michelle Linares M.|
 | Domenik Bächler|
 | Dario Filippone|

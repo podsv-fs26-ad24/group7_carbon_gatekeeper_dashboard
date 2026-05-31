@@ -849,16 +849,34 @@ if hist_file is None:
     )
 else:
     # 27. load and validate historical workbook
-    hist_book = load_workbook(hist_file.getvalue())
+    with st.spinner("Loading historical data…"):
+        try:
+            hist_book = load_workbook(hist_file.getvalue())
+        except Exception:
+            st.error(
+                "Could not read the historical file. "
+                "Please make sure it is a valid Excel (.xlsx) file."
+            )
+            st.stop()
     if "travel_data" not in hist_book:
-        st.error("Sheet 'travel_data' not found in the historical file.")
+        st.error(
+            f"Sheet **'travel_data'** not found in **{hist_file.name}**. "
+            f"Available sheets: {', '.join(hist_book.keys())}. "
+            "Please upload the correct historical reference file."
+        )
     else:
         hist = hist_book["travel_data"].copy()
         missing = [c for c in REQUIRED_HIST if c not in hist.columns]
         if missing:
-            st.error(f"Historical file is missing columns: {missing}")
+            st.error(
+                f"The historical file is missing required columns: `{'`, `'.join(missing)}`. "
+                "Please check that you uploaded the correct file (`traveldata-export_clean.xlsx`)."
+            )
         elif co2_metric not in hist.columns:
-            st.error(f"CO2 column '{co2_metric}' not found in historical data.")
+            st.error(
+                f"CO2 column **'{co2_metric}'** not found in the historical data. "
+                "Please check the selected accounting metric in the sidebar."
+            )
         else:
             hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
             budgets = parse_budgets(hist_book.get("budget_2026"))
@@ -867,20 +885,33 @@ else:
             # 28. load planned trips or fall back to historical data
             _inp_error = None
             if input_file is not None:
-                inp_book = load_workbook(input_file.getvalue())
-                sheet_name = next(
-                    (s for s in ["planned_trips", "travel_data"] if s in inp_book),
-                    list(inp_book.keys())[0],
-                )
-                inp = inp_book[sheet_name].copy()
-                miss_in = [c for c in REQUIRED_INPUT if c not in inp.columns]
-                if miss_in:
-                    _inp_error = f"Input file is missing required columns: {miss_in}"
-                else:
-                    if "date" in inp.columns:
-                        inp["date"] = pd.to_datetime(inp["date"], errors="coerce")
-                    src_label = f"Planned trips file ({input_file.name})"
-                    n_input = len(inp)
+                with st.spinner("Loading planned trips…"):
+                    try:
+                        inp_book = load_workbook(input_file.getvalue())
+                    except Exception:
+                        _inp_error = (
+                            f"Could not read **{input_file.name}**. "
+                            "Please make sure it is a valid Excel (.xlsx) file."
+                        )
+                        inp_book = None
+                if inp_book is not None:
+                    sheet_name = next(
+                        (s for s in ["planned_trips", "travel_data"] if s in inp_book),
+                        list(inp_book.keys())[0],
+                    )
+                    inp = inp_book[sheet_name].copy()
+                    miss_in = [c for c in REQUIRED_INPUT if c not in inp.columns]
+                    if miss_in:
+                        _inp_error = (
+                            f"The planned trips file is missing required columns: "
+                            f"`{'`, `'.join(miss_in)}`. "
+                            "Please check that you uploaded the correct input file."
+                        )
+                    else:
+                        if "date" in inp.columns:
+                            inp["date"] = pd.to_datetime(inp["date"], errors="coerce")
+                        src_label = f"Planned trips file ({input_file.name})"
+                        n_input = len(inp)
             else:
                 inp = hist.copy()
                 src_label = "Historical data (no planned trips uploaded)"

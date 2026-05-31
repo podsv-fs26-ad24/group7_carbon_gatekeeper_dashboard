@@ -12,17 +12,37 @@ A central **"Apply alternatives"** toggle recomputes the entire dashboard — KP
 
 ## Project Organisation
 
-The project follows a structured visualization product development process across four phases:
+The project follows a structured visualization product development process. Here is what matters most for getting oriented:
 
-| Phase | Code / Data | Documentation |
-|:------|:------------|:--------------|
-| Project Understanding | — | `docs/project_charta.qmd` |
-| Data Acquisition & Exploration | `data_acquisition/`, `eda/` | `docs/data_report.qmd` |
-| Visual Encoding & Design | `app.py`, `encoding-design/` | `docs/viz_design_report.qmd` |
-| Evaluation | `evaluation/` | `docs/evaluation.qmd` |
-| Deployment | `deployment/` | `docs/deployment.qmd` |
+**The app**
 
-Full project documentation is available as a Quarto website in the `docs/` folder (see [Documentation](#documentation) below).
+The dashboard entry point is `deployment/app.py`. This is the file you run with Streamlit.
+
+**The data**
+
+| File | Path | Description |
+|:-----|:-----|:------------|
+| `traveldata-export_clean.xlsx` | `data_acquisition/data_clean/` | Historical travel records and CO₂ budgets — required to run the dashboard |
+| `input_data.xlsx` | `data_acquisition/input_data/` | Planned trips for analysis — upload alongside the historical file |
+| `traveldata-export.xlsx` | `data_acquisition/raw/` | Original raw data, for reference only |
+
+**Exploratory analysis**
+
+`eda/eda_travel_data.ipynb` contains the full exploratory data analysis of the historical dataset.
+
+**Documentation**
+
+All project documentation lives in `docs/` as Quarto (`.qmd`) files:
+
+| File | Content |
+|:-----|:--------|
+| `project_charta.qmd` | Project goals, stakeholders, and visualization concept |
+| `data_report.qmd` | Data sources, structure, and quality |
+| `viz_design_report.qmd` | Visual encoding decisions and dashboard design |
+| `evaluation.qmd` | Usability evaluation and findings |
+| `deployment.qmd` | Deployment setup and architecture |
+
+A pre-rendered version of the documentation is available in `docs/build/` — open `docs/build/index.html` in a browser to view it without building.
 
 ---
 

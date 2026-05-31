@@ -161,10 +161,10 @@ The rendered site is output to `docs/build/`. Open `docs/build/index.html` in a 
 
 | Name | Role |
 |:-----|:-----|
-| Michelle Linares M. | Project coordination, visualization design |
-| Domenik Bächler | Data analysis and processing |
-| Dario Filippone | Dashboard development |
-| Ajna Binaki | User analysis and evaluation |
+| Michelle Linares M.|
+| Domenik Bächler|
+| Dario Filippone|
+| Ajna Binaki|
 
 ---
 

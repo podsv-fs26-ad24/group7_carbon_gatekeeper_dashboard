@@ -98,8 +98,8 @@ The dashboard requires two Excel files, both located in `data_acquisition/data_c
 
 | File | Location | Role | Required |
 |:-----|:---------|:-----|:--------:|
-| `traveldata-export_clean.xlsx` | `data_acquisition/data_clean/` | Historical travel records including CO₂ baselines per route and annual CO₂ budgets per Business Unit | ✅ Yes |
-| `input_data.xlsx` (`input_data2.xlsx` – `input_data4.xlsx`) | `data_acquisition/data_clean/` | Planned trips to be analysed against the historical data | ✅ Yes |
+| `traveldata-export_clean.xlsx` | `data_acquisition/data_clean/` | Historical travel records including CO₂ baselines per route and annual CO₂ budgets per Business Unit | Yes |
+| `input_data.xlsx` (`input_data2.xlsx` – `input_data4.xlsx`) | `data_acquisition/data_clean/` | Planned trips to be analysed against the historical data | Yes |
 
 The historical reference file is required for the dashboard to function. Without it, no data can be loaded. The planned trips file enables route comparison, alternative transport recommendations, and CO₂ savings calculations.
 

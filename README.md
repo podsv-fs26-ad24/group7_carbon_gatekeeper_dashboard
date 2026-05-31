@@ -1,6 +1,6 @@
 # Carbon Gatekeeper Dashboard
 
-An interactive, web-based decision-support tool that links planned business travel to annual CO₂ budgets. The dashboard analyses planned itineraries against historical travel records to answer three operational questions:
+An interactive and web-based decision-support tool that links planned business travel to annual CO₂ budgets. The dashboard analyses planned itineraries against historical travel records to answer three operational questions:
 
 - What is the current CO₂ budget status and compliance across all Business Units?
 - Which planned routes have viable lower-carbon transport alternatives?
